@@ -87,9 +87,9 @@ Why this chart answers the question:
 - Adding casualties keeps the human-cost layer visible, preventing the story from becoming only a budget chart.
 
 ## Integrated CLI Tools ("functions")
-This repository now includes the CLI tool engine under `dist/` with commands for research and utility workflows.
+This repository includes a CLI tool engine under `cli/` with commands for research and utility workflows.
 
-### Available commands
+### Available CLI commands
 - `help` -> list available commands
 - `status` -> show engine and plugin status
 - `version` -> show CLI version
@@ -101,13 +101,85 @@ This repository now includes the CLI tool engine under `dist/` with commands for
 - `generate-image <prompt> ...` -> DALL-E image generation (requires `OPENAI_API_KEY`)
 - `analyze-website <url> ...` -> screenshot + Gemini analysis (requires `GEMINI_API_KEY`)
 
-### Setup
+### CLI Setup
 1. Install dependencies: `npm install`
 2. Create env file: copy `.env.example` to `.env` and add keys
-3. Run commands:
-   - `npm run help`
-   - `npm run status`
-   - `node dist/index.js multiply 250 3`
+3. Run CLI commands:
+   - `npm run cli:help`
+   - `npm run cli:status`
+   - `node cli/index.js multiply 250 3`
 
 ### Reliability note
-The CLI now starts even if AI keys are missing. AI-only plugins are skipped with warnings until keys are configured.
+The CLI starts even if AI keys are missing. AI-only plugins are skipped with warnings until keys are configured.
+
+---
+
+## Phase 2: Data Pipeline + Contract
+
+### Cleaning & Transform Notes
+
+**Raw → Processed Pipeline:**
+1. **Input:** `data/raw.csv` (7 rows, 2018–2024)
+2. **Parser:** `src/lib/loadData.ts` → `parseRawCSV()` handles quoted CSV fields and type conversion
+3. **Validation:** Each row is validated against `src/lib/schema.ts` constraints:
+   - Year must be 2000–2030
+   - All numeric fields must be positive (except casualties ≥ 0)
+   - Invalid rows are logged and skipped
+4. **Transform:** `transformToProcessed()` generates metadata + summary statistics
+5. **Output:** `data/processed.json` (typed, validated, ready for UI consumption)
+
+**Data Quality Checks:**
+- ✅ No missing values in current dataset
+- ✅ All years sequential and ascending
+- ✅ No anomalies detected (no >50% year-over-year jumps)
+- ⚠️ Casualties are estimates (see provenance notes)
+- ⚠️ CPI is a derived index, not a single BLS series
+
+**Run the pipeline:**
+```bash
+npm run process-data
+```
+
+This regenerates `data/processed.json` from `data/raw.csv` with full validation and summary stats.
+
+### Definitions (Key Terms)
+
+**Military Spending (Mil_Spend_USD_Billions)**  
+Total U.S. annual military expenditure in billions of current USD. Includes defense budget, operations, and procurement. Source: SIPRI.
+
+**CPI Food & Energy Index (CPI_Food_Energy_Index)**  
+A classroom-friendly combined index tracking consumer price pressure for food and energy. Derived from BLS CPI-U series. Higher values = higher cost of living.
+
+**Education Funding Gap (Edu_Funding_Gap_Billions)**  
+An *opportunity cost proxy* representing the narrative tension between defense spending and education investment. **Not** a literal federal budget line item. Used to communicate trade-offs to student audiences.
+
+**Casualties Estimate (Casualties_Est)**  
+Estimated total conflict-related deaths (direct + indirect) for context. Numbers are modeled from Brown University Costs of War research and carry methodological uncertainty.
+
+**Processed Dataset**  
+The output of our data pipeline (`data/processed.json`). A typed, validated JSON structure with:
+- `metadata`: processing timestamp, record counts, year range, quality flags
+- `data`: array of validated data points
+- `summary`: aggregate statistics (total spend, avg CPI growth, total casualties)
+
+**Data Contract**  
+The TypeScript interface (`ProcessedDataset` in `src/lib/schema.ts`) that guarantees the shape of data flowing into the UI. Frontend code can trust this contract without re-validating.
+
+### Phase 2 Engineering Acceptance
+
+✅ **Build Commands Work:**
+```bash
+npm run dev          # Launches Vite dev server at http://localhost:5173
+npm run build        # Compiles TypeScript, bundles with Vite → build/
+npm run process-data # Regenerates data/processed.json from raw CSV
+```
+
+✅ **No Magic Numbers:**  
+All constants are named and documented in `src/lib/schema.ts`:
+- `CPI_BASE_YEAR = 2018`
+- `MIN_VALID_YEAR = 2000`
+- `MAX_VALID_YEAR = 2030`
+- `ANOMALY_THRESHOLD_PCT = 50`
+
+✅ **Type Safety:**  
+Full TypeScript contracts prevent runtime errors. Schema validation at build time ensures data integrity before it reaches the browser.

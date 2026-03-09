@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Angela's Midterm Project | The Cost of War</title>
+    <meta name="description" content="Data-driven exploration of war's impact on humanity, society, and student life" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>The Cost of War</h1>
+        <p class="subtitle">Understanding the impact on humanity and society</p>
+      </header>
+
+      <main>
+        <section id="intro">
+          <h2>Essential Question</h2>
+          <p class="question">What is the cost of war to humanity and society?</p>
+          
+          <div class="claim">
+            <h3>Hypothesis</h3>
+            <p>War costs homes, lives, and money; it harms people and ecosystems, and the public should care more about those consequences.</p>
+          </div>
+        </section>
+
+        <section id="data-summary">
+          <h2>Data Overview</h2>
+          <div id="summary-cards" class="card-grid">
+            <div class="card loading">Loading data...</div>
+          </div>
+        </section>
+
+        <section id="visualization">
+          <h2>Key Metrics</h2>
+          <div id="chart-container">
+            <p class="note">Interactive visualization will be added in Phase 3</p>
+          </div>
+        </section>
+
+        <section id="data-table">
+          <h2>Dataset</h2>
+          <div id="table-container">
+            <table id="data-display">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Military Spending ($B)</th>
+                  <th>CPI Index</th>
+                  <th>Education Gap ($B)</th>
+                  <th>Casualties</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>&copy; 2026 Angela Vazquez | Student Reality Lab</p>
+        <p class="data-source">Data sources: SIPRI, BLS, Brown University Costs of War Project</p>
+      </footer>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -2,19 +2,27 @@
   "name": "student-reality-lab-vazquez",
   "version": "1.0.0",
   "private": true,
-  "description": "Phase 1 repo with integrated AI CLI toolset",
-  "main": "dist/index.js",
-  "type": "commonjs",
+  "description": "Phase 2: Data pipeline + web app with integrated AI CLI toolset",
+  "type": "module",
   "scripts": {
-    "start": "node dist/index.js",
-    "help": "node dist/index.js help",
-    "status": "node dist/index.js status",
-    "version": "node dist/index.js version"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "process-data": "tsx src/lib/processData.ts",
+    "cli": "node cli/index.js",
+    "cli:help": "node cli/index.js help",
+    "cli:status": "node cli/index.js status"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "dotenv": "^16.6.1",
     "openai": "^4.104.0",
     "playwright": "^1.54.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
   }
 }
