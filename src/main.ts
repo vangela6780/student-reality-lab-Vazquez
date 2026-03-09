@@ -231,10 +231,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
     </section>
     
     <footer class="site-footer">
-      <p><strong>Data Sources:</strong> SIPRI, World Bank, UCDP</p>
-      <p><strong>Processed:</strong> ${new Date(dataset.metadata.processedAt).toLocaleString()}</p>
-      <p><strong>Project:</strong> Student Reality Lab - Angela Vazquez</p>
-      <p>&copy; 2026 Angela Vazquez. All rights reserved.</p>
+      <p>&copy; 2026 Angela Vazquez | Student Reality Lab</p>
     </footer>
   `;
   
