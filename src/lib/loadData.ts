@@ -14,7 +14,7 @@ import { validateDataPoint } from './schema';
 export async function loadProcessedData(): Promise<ProcessedDataset> {
   try {
     // Dynamic import of processed data
-    const response = await fetch('/data/processed.json');
+    const response = await fetch(`${import.meta.env.BASE_URL}data/processed.json`);
     if (!response.ok) {
       throw new Error(`Failed to load data: ${response.statusText}`);
     }
