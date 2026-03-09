@@ -75,7 +75,7 @@ class CLIIOHandler {
     }
     writeError(error) {
         const message = error instanceof Error ? error.message : error;
-        console.error(`❌ ${message}`);
+        console.error(`Error: ${message}`);
     }
 }
 exports.CLIIOHandler = CLIIOHandler;
