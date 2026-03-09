@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // Use relative asset paths so the app works under GitHub Pages subpaths.
-  base: './',
+  // Use explicit GitHub Pages base so assets load reliably with or without trailing slash.
+  base: '/student-reality-lab-Vazquez/',
   root: './',
   publicDir: 'public',
   build: {
