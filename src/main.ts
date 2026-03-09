@@ -71,18 +71,21 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
         <div class="story-text">
           <h2>Context: Why Students Should Care</h2>
           <p>
-            Students feel global conflict through daily costs: food, transportation, and energy bills rise,
-            while public spending tradeoffs shape school and community resources. This story tracks how
-            military spending, household pressure indicators, and casualties moved together across 2018–2024.
+            <strong>You didn't choose to be born into a world at war.</strong> But as a student preparing for adulthood,
+            you're living through its costs. Whether you worry about gas prices, tuition, food budgets, or job prospects—
+            these are shaped by how governments spend money. Understanding the correlation between military spending and
+            household pressure isn't just academic; it's preparation for your future.
           </p>
           <p>
-            The timeline starts before the 2022 escalation and continues through its aftereffects.
-            That gives a clear baseline and a post-shock period for comparison.
+            This story tracks how military spending, household pressure indicators (food & energy costs), and human casualties
+            moved together from 2018–2024. It starts before the 2022 escalation and continues through its aftereffects,
+            giving us a clear baseline and a post-shock period to compare.
           </p>
           <p class="insight">
-            <strong>Headline context:</strong> Annual military spending rose by
-            <strong>$${yearlySpendDiff.toLocaleString()}B</strong> across the time window,
-            while annual casualties rose by <strong>${yearlyCasualtyDiff.toLocaleString()}</strong>.
+            <strong>The numbers:</strong> Annual military spending rose by
+            <strong>$${yearlySpendDiff.toLocaleString()}B</strong> across this period,
+            while estimated conflict casualties rose by <strong>${yearlyCasualtyDiff.toLocaleString()}</strong>.
+            Does higher spending align with higher human cost? Let's look at the data.
           </p>
         </div>
       </section>
@@ -179,9 +182,21 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
             This does <strong>not</strong> prove strict causation. It does show a measurable relationship worth public attention,
             student discussion, and policy literacy.
           </p>
+          <div class="student-callout">
+            <h3>🎓 Why This Matters for Your Future</h3>
+            <p>
+              You're about to vote, work, borrow money for school, and make career decisions in a world shaped by 
+              government budget priorities. Understanding how military spending correlates with household costs helps you:
+            </p>
+            <ul>
+              <li><strong>Hold policymakers accountable</strong> for explaining budget tradeoffs</li>
+              <li><strong>Plan financially</strong> knowing that global conflicts can affect your cost of living</li>
+              <li><strong>Engage in civic debate</strong> with data instead of just headlines</li>
+            </ul>
+          </div>
           <p class="insight">
             <strong>Actionable student takeaway:</strong> Track both budget priorities and cost-of-living indicators when evaluating
-            public policy claims about "security" and "stability."
+            public policy claims about "security" and "stability." The two are connected.
           </p>
         </div>
       </section>
@@ -219,6 +234,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       <p><strong>Data Sources:</strong> SIPRI, World Bank, UCDP</p>
       <p><strong>Processed:</strong> ${new Date(dataset.metadata.processedAt).toLocaleString()}</p>
       <p><strong>Project:</strong> Student Reality Lab - Angela Vazquez</p>
+      <p>&copy; 2026 Angela Vazquez. All rights reserved.</p>
     </footer>
   `;
   
