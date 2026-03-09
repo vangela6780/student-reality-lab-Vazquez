@@ -45,6 +45,10 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
     ? ((postAvgCasualties - preAvgCasualties) / preAvgCasualties) * 100
     : 0;
 
+  const firstPoint = dataset.data[0];
+  const lastPoint = dataset.data[dataset.data.length - 1];
+  const cpiDelta = lastPoint.cpiIndex - firstPoint.cpiIndex;
+
   const yearlySpendDiff = dataset.data[dataset.data.length - 1].militarySpendUSD - dataset.data[0].militarySpendUSD;
   const yearlyCasualtyDiff = dataset.data[dataset.data.length - 1].casualties - dataset.data[0].casualties;
   
@@ -111,6 +115,18 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
 
         <div class="chart-container">
           <canvas id="main-chart"></canvas>
+        </div>
+
+        <div class="chart-info" id="chart-info" aria-live="polite">
+          <h3 id="chart-info-title">CPI Impact View</h3>
+          <p id="chart-info-summary">
+            CPI rose by ${cpiDelta.toFixed(1)} points from ${firstPoint.year} to ${lastPoint.year},
+            with the sharpest increase after 2022.
+          </p>
+          <p class="chart-info-detail">
+            Read this as household pressure: higher food and energy index values mean students and families face
+            tighter budgets for transport, groceries, and utilities.
+          </p>
         </div>
 
         <div class="annotation-note">
@@ -216,8 +232,35 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
 function setupInteraction(dataset: ProcessedDataset): void {
   void dataset;
 
+  const firstPoint = dataset.data[0];
+  const lastPoint = dataset.data[dataset.data.length - 1];
+  const cpiDelta = lastPoint.cpiIndex - firstPoint.cpiIndex;
+  const casualtiesDelta = lastPoint.casualties - firstPoint.casualties;
+
   const cpiBtn = document.getElementById('toggle-cpi');
   const casualtiesBtn = document.getElementById('toggle-casualties');
+  const infoTitle = document.getElementById('chart-info-title');
+  const infoSummary = document.getElementById('chart-info-summary');
+  const infoDetail = document.querySelector<HTMLParagraphElement>('.chart-info-detail');
+
+  const updateChartInfo = (mode: ViewMode): void => {
+    if (!infoTitle || !infoSummary || !infoDetail) return;
+
+    if (mode === 'cpi') {
+      infoTitle.textContent = 'CPI Impact View';
+      infoSummary.textContent =
+        `CPI rose by ${cpiDelta.toFixed(1)} points from ${firstPoint.year} to ${lastPoint.year}, with the sharpest increase after 2022.`;
+      infoDetail.textContent =
+        'Read this as household pressure: higher food and energy index values mean students and families face tighter budgets for transport, groceries, and utilities.';
+      return;
+    }
+
+    infoTitle.textContent = 'Human Casualties View';
+    infoSummary.textContent =
+      `Annual casualties increased by ${casualtiesDelta.toLocaleString()} between ${firstPoint.year} and ${lastPoint.year}, with the steepest rise in the post-2022 period.`;
+    infoDetail.textContent =
+      'Read this as human cost: higher casualty counts indicate conflict escalation and larger long-term social harm beyond immediate battlefield losses.';
+  };
   
   const buttons = [cpiBtn, casualtiesBtn];
   
@@ -234,6 +277,9 @@ function setupInteraction(dataset: ProcessedDataset): void {
       
       // Toggle chart view
       chart.toggleView(mode);
+      updateChartInfo(mode);
     });
   });
+
+  updateChartInfo('cpi');
 }
