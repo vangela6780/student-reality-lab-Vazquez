@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
   Filler,
+  type TooltipItem,
 } from 'chart.js';
 import type { ProcessedDataset } from './schema';
 
@@ -124,8 +125,8 @@ export class InteractiveChart {
             padding: 12,
             displayColors: true,
             callbacks: {
-              afterLabel: (context) => {
-                if (parseInt(context.label) === annotationYear && context.datasetIndex === 1) {
+              afterLabel: (context: TooltipItem<'bar'>) => {
+                if (parseInt(String(context.label), 10) === annotationYear && context.datasetIndex === 1) {
                   return '⚠️ Sharp acceleration point';
                 }
                 return '';
@@ -155,7 +156,7 @@ export class InteractiveChart {
             },
             ticks: {
               color: 'rgba(10, 75, 179, 1)',
-              callback: (value) => '$' + value + 'B',
+              callback: (value: string | number) => '$' + value + 'B',
             },
             grid: { color: 'rgba(17, 17, 17, 0.08)' },
           },
@@ -172,7 +173,7 @@ export class InteractiveChart {
             },
             ticks: {
               color: 'rgba(190, 32, 38, 1)',
-              callback: (value) => this.viewMode === 'cpi' ? value.toString() : value + 'k',
+              callback: (value: string | number) => this.viewMode === 'cpi' ? value.toString() : value + 'k',
             },
             grid: { display: false },
           },
@@ -209,7 +210,7 @@ export class InteractiveChart {
     
     // Update tick callback for casualties mode
     if (this.chart.options.scales?.y1 && 'ticks' in this.chart.options.scales.y1 && this.chart.options.scales.y1.ticks) {
-      this.chart.options.scales.y1.ticks.callback = (value) => 
+      this.chart.options.scales.y1.ticks.callback = (value: string | number) => 
         this.viewMode === 'cpi' ? value.toString() : value + 'k';
     }
     
