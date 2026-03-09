@@ -85,3 +85,29 @@ Suggested chart setup:
 Why this chart answers the question:
 - It places economic burden (military spending and household price pressure) on one timeline so viewers can see whether peaks move together.
 - Adding casualties keeps the human-cost layer visible, preventing the story from becoming only a budget chart.
+
+## Integrated CLI Tools ("functions")
+This repository now includes the CLI tool engine under `dist/` with commands for research and utility workflows.
+
+### Available commands
+- `help` -> list available commands
+- `status` -> show engine and plugin status
+- `version` -> show CLI version
+- `echo <text>` -> echo back text
+- `add <a> <b>` -> add two numbers (calculator plugin)
+- `subtract <a> <b>` -> subtract two numbers (calculator plugin)
+- `multiply <a> <b>` -> multiply two numbers (calculator plugin)
+- `search <query> [--output <file>]` -> AI web research (requires `OPENAI_API_KEY`)
+- `generate-image <prompt> ...` -> DALL-E image generation (requires `OPENAI_API_KEY`)
+- `analyze-website <url> ...` -> screenshot + Gemini analysis (requires `GEMINI_API_KEY`)
+
+### Setup
+1. Install dependencies: `npm install`
+2. Create env file: copy `.env.example` to `.env` and add keys
+3. Run commands:
+   - `npm run help`
+   - `npm run status`
+   - `node dist/index.js multiply 250 3`
+
+### Reliability note
+The CLI now starts even if AI keys are missing. AI-only plugins are skipped with warnings until keys are configured.
