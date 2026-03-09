@@ -127,7 +127,7 @@ export class InteractiveChart {
             callbacks: {
               afterLabel: (context: TooltipItem<'bar'>) => {
                 if (parseInt(String(context.label), 10) === annotationYear && context.datasetIndex === 1) {
-                  return '⚠️ Sharp acceleration point';
+                  return 'Sharp acceleration point';
                 }
                 return '';
               },

@@ -208,7 +208,9 @@ h2 {
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(17, 17, 17, 0.2);
-  background: linear-gradient(180deg, #fffef8, #f2efe5);
+  background: linear-gradient(180deg, #0f4eb8, #093a8d);
+  border-color: #0f4eb8;
+  color: #f8f8f8;
 }
 
 .btn:focus-visible {
@@ -256,6 +258,49 @@ h2 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.data-table-section {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: clamp(1.1rem, 2vw, 1.7rem);
+  margin-bottom: 1.8rem;
+  box-shadow: 0 10px 26px var(--shadow);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  padding: 0.62rem 0.7rem;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.data-table th {
+  background: rgba(10, 75, 179, 0.92);
+  color: #f8f8f8;
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: rgba(245, 183, 0, 0.12);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(10, 75, 179, 0.14);
 }
 
 .card {

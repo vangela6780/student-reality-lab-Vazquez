@@ -19,7 +19,7 @@ loadProcessedData()
     console.error('Failed to load dataset:', error);
     document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <div class="error">
-        <h2>⚠️ Failed to load dataset</h2>
+        <h2>Failed to load dataset</h2>
         <p>${error.message}</p>
       </div>
     `;
@@ -65,10 +65,10 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
     <section class="chart-section">
       <div class="controls">
         <button id="toggle-cpi" class="btn btn-active" data-mode="cpi">
-          📊 View: CPI Impact
+          View: CPI Impact
         </button>
         <button id="toggle-casualties" class="btn" data-mode="casualties">
-          ⚠️ View: Human Casualties
+          View: Human Casualties
         </button>
       </div>
       
@@ -77,7 +77,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </div>
       
       <div class="annotation-note">
-        <strong>📍 Annotation:</strong> 2022 marks the acceleration point (gold dot) where 
+        <strong>Annotation:</strong> 2022 marks the acceleration point (gold dot) where 
         military spending crossed $850B, correlating with Ukraine conflict and global supply 
         chain disruptions. This year saw the sharpest single-year increases in both CPI 
         and casualties since 2018.
@@ -101,6 +101,34 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
         <h3>Total Casualties</h3>
         <p class="stat">${dataset.summary.totalCasualties.toLocaleString()}</p>
         <p class="label">Estimated Deaths</p>
+      </div>
+    </section>
+
+    <section class="data-table-section">
+      <h2>Dataset Display</h2>
+      <div class="table-wrap">
+        <table class="data-table" aria-label="War cost dataset">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Military Spending ($B)</th>
+              <th>CPI Index</th>
+              <th>Education Gap ($B)</th>
+              <th>Casualties</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dataset.data.map((d) => `
+              <tr>
+                <td>${d.year}</td>
+                <td>$${d.militarySpendUSD.toLocaleString()}</td>
+                <td>${d.cpiIndex.toFixed(1)}</td>
+                <td>$${d.educationGap.toLocaleString()}</td>
+                <td>${d.casualties.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </div>
     </section>
     
