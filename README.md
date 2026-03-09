@@ -1,0 +1,87 @@
+# Angela's Midterm Project
+
+## Essential Question (1 sentence)
+What is the cost of war to humanity and society?
+
+## Claim (Hypothesis) (1 sentence; can be wrong)
+War costs homes, lives, and money; it harms people and ecosystems, and the public should care more about those consequences.
+
+## Audience (who is this for?)
+My audience is students and community members who want global context, not only Western media headlines.
+
+## STAR Draft (bullets)
+- **S — Situation: Why this matters to students now**
+  War-related disruption can raise fuel and food costs, strain public budgets, and increase pressure on tuition, transit, and career planning for students entering adulthood.
+- **T — Task: What the viewer should be able to conclude or do**
+  The viewer should be able to conclude that war has measurable human and economic costs, and distinguish between direct military costs and social opportunity costs.
+- **A — Action: What you will build (views + interaction)**
+  I will build an interactive website with linked articles, interviews, research summaries, a gallery, and veteran/civilian testimonials.
+- **R — Result: What you expect the data to show; what metric you'll report**
+  I expect the data to show that higher military spending years align with higher household pressure indicators (food/energy CPI and education affordability pressure). I will report year-over-year percent change and a simple correlation value.
+
+## Dataset & Provenance (source links + retrieval date + license/usage)
+Primary and supporting sources used for this Phase 1 starter dataset:
+
+1. **SIPRI Military Expenditure Database**
+   - Link: https://www.sipri.org/databases/milex
+   - Field used: U.S. annual military expenditure (current USD, billions)
+   - Retrieval date: 2026-03-09
+   - Usage: SIPRI terms of use (research/educational analysis; cite source)
+
+2. **U.S. Bureau of Labor Statistics (BLS) CPI**
+   - Link: https://www.bls.gov/cpi/
+   - Fields used: CPI-U food-related and energy-related series (combined into one classroom index in this project)
+   - Retrieval date: 2026-03-09
+   - Usage: U.S. government public data (generally public domain)
+
+3. **Costs of War Project (Brown University, Watson Institute)**
+   - Link: https://watson.brown.edu/costsofwar/
+   - Field used: Conflict death burden context for human-cost layer
+   - Retrieval date: 2026-03-09
+   - Usage: Educational/non-commercial use with citation (see site terms)
+
+4. **World Bank Data (macro context checks)**
+   - Link: https://data.worldbank.org/
+   - Retrieval date: 2026-03-09
+   - Usage: CC BY-4.0 for World Bank indicators
+
+## Data Dictionary (minimum 5 rows: column -> meaning -> units)
+| Column | Meaning | Units |
+|---|---|---|
+| Year | Calendar/fiscal reference year | YYYY |
+| Mil_Spend_USD_Billions | U.S. military expenditure | Billions of current USD |
+| CPI_Food_Energy_Index | Combined classroom index tracking food + energy consumer pressure (derived from BLS CPI series) | Index (base-style, unitless) |
+| Edu_Funding_Gap_Billions | Estimated education opportunity-cost proxy associated with higher defense prioritization in public narratives (project metric) | Billions of USD |
+| Casualties_Est | Estimated direct + indirect conflict-related deaths used for narrative context | People (count) |
+| Source_Notes | Short provenance note for each row | Text |
+
+## Data Viability Audit
+### Missing values + weird fields
+- `Casualties_Est` is an estimate and has uncertainty bands in underlying literature; exact annual attribution is difficult.
+- CPI is merged into one classroom-friendly `CPI_Food_Energy_Index`; this is a derived field, not a native single BLS series.
+- `Edu_Funding_Gap_Billions` is a proxy metric for storytelling and should not be interpreted as a federal accounting ledger value.
+- Multi-source rows can create year-boundary mismatch (calendar year vs fiscal year reporting).
+
+### Cleaning plan
+- Convert all numeric fields to strict numeric types; strip commas and symbols.
+- Keep `Year` as integer and sort ascending.
+- Standardize military spend to current USD billions for comparability.
+- Document derived-field formulas in `data/notes.md`.
+- For missing or delayed casualty estimates, keep nulls and annotate instead of fabricating values.
+
+### What this dataset cannot prove (limits/bias)
+- It cannot prove war is the sole cause of inflation or tuition pressure.
+- It cannot establish strict causation between defense spending and student cost-of-living stress without controls.
+- Casualty totals are method-dependent and can vary by source methodology.
+- U.S.-focused spending data does not represent all countries equally.
+
+## Draft Chart Screenshot (from Sheets/Excel) + 2 bullets explaining why the chart answers the question
+**Screenshot placeholder:** Add your chart image after importing `data/raw.csv` into Sheets or Excel.
+
+Suggested chart setup:
+- Chart type: Combo chart (columns for `Mil_Spend_USD_Billions`, line for `CPI_Food_Energy_Index`; optional secondary line for `Casualties_Est` on secondary axis).
+- X-axis: `Year`.
+
+Why this chart answers the question:
+- It places economic burden (military spending and household price pressure) on one timeline so viewers can see whether peaks move together.
+- Adding casualties keeps the human-cost layer visible, preventing the story from becoming only a budget chart.
