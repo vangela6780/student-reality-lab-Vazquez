@@ -9,8 +9,6 @@ import type { ProcessedDataset } from './lib/schema';
 
 let chart: InteractiveChart | null = null;
 
-type NarrativeView = 'context' | 'evidence' | 'counterpoint' | 'takeaway';
-
 // Load and display interactive visualization
 loadProcessedData()
   .then((dataset: ProcessedDataset) => {
@@ -56,14 +54,15 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       <p class="subtitle">Interactive Data Story (2018–2024)</p>
     </header>
 
-    <section class="narrative-nav" aria-label="Story Views">
-      <button class="story-tab story-tab-active" data-story-view="context" aria-controls="view-context">1. Context</button>
-      <button class="story-tab" data-story-view="evidence" aria-controls="view-evidence">2. Evidence</button>
-      <button class="story-tab" data-story-view="counterpoint" aria-controls="view-counterpoint">3. Counterpoint</button>
-      <button class="story-tab" data-story-view="takeaway" aria-controls="view-takeaway">4. Takeaway</button>
-    </section>
+    <nav class="story-navbar" aria-label="Story navigation">
+      <a href="#context" class="story-link">Context</a>
+      <a href="#evidence" class="story-link">Evidence</a>
+      <a href="#counterpoint" class="story-link">Counterpoint</a>
+      <a href="#takeaway" class="story-link">Takeaway</a>
+      <a href="#dataset" class="story-link">Dataset</a>
+    </nav>
 
-    <section id="view-context" class="story-view">
+    <section id="context" class="story-view">
       <section class="story-section">
         <div class="story-text">
           <h2>Context: Why Students Should Care</h2>
@@ -85,7 +84,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </section>
     </section>
     
-    <section id="view-evidence" class="story-view" hidden>
+    <section id="evidence" class="story-view">
       <section class="story-section">
         <div class="story-text">
           <h2>Evidence: Linked Trends Over Time</h2>
@@ -121,7 +120,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </section>
     </section>
 
-    <section id="view-counterpoint" class="story-view" hidden>
+    <section id="counterpoint" class="story-view">
       <section class="story-section">
         <div class="story-text">
           <h2>Counterpoint: Pre vs. Post 2022 Segmentation</h2>
@@ -151,7 +150,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </section>
     </section>
 
-    <section id="view-takeaway" class="story-view" hidden>
+    <section id="takeaway" class="story-view">
       <section class="story-section">
         <div class="story-text">
           <h2>Takeaway: What This Means for Students</h2>
@@ -172,7 +171,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </section>
     </section>
 
-    <section class="data-table-section">
+    <section id="dataset" class="data-table-section">
       <h2>Dataset Display</h2>
       <div class="table-wrap">
         <table class="data-table" aria-label="War cost dataset">
@@ -214,28 +213,6 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
 
 function setupInteraction(dataset: ProcessedDataset): void {
   void dataset;
-
-  const storyTabs = document.querySelectorAll<HTMLButtonElement>('.story-tab');
-  const storyViews = document.querySelectorAll<HTMLElement>('.story-view');
-
-  const setStoryView = (view: NarrativeView): void => {
-    storyTabs.forEach((tab) => {
-      const isActive = tab.dataset.storyView === view;
-      tab.classList.toggle('story-tab-active', isActive);
-      tab.setAttribute('aria-selected', String(isActive));
-    });
-
-    storyViews.forEach((panel) => {
-      panel.hidden = panel.id !== `view-${view}`;
-    });
-  };
-
-  storyTabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const view = tab.dataset.storyView as NarrativeView;
-      setStoryView(view);
-    });
-  });
 
   const cpiBtn = document.getElementById('toggle-cpi');
   const casualtiesBtn = document.getElementById('toggle-casualties');
