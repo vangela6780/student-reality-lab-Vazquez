@@ -1,5 +1,5 @@
 /**
- * Phase 3: Interactive Proof Machine — One View That Proves the Claim
+ * Phase 4: Full Story narrative with 4 purposeful views.
  */
 
 import './style.css';
@@ -8,6 +8,8 @@ import { InteractiveChart, type ViewMode } from './lib/chart';
 import type { ProcessedDataset } from './lib/schema';
 
 let chart: InteractiveChart | null = null;
+
+type NarrativeView = 'context' | 'evidence' | 'counterpoint' | 'takeaway';
 
 // Load and display interactive visualization
 loadProcessedData()
@@ -27,109 +29,175 @@ loadProcessedData()
 
 function displayInteractiveView(dataset: ProcessedDataset): void {
   const app = document.querySelector<HTMLDivElement>('#app')!;
+
+  const pre2022 = dataset.data.filter((d) => d.year <= 2021);
+  const post2021 = dataset.data.filter((d) => d.year >= 2022);
+
+  const avg = (values: number[]): number => {
+    if (values.length === 0) return 0;
+    return values.reduce((sum, v) => sum + v, 0) / values.length;
+  };
+
+  const preAvgCpi = avg(pre2022.map((d) => d.cpiIndex));
+  const postAvgCpi = avg(post2021.map((d) => d.cpiIndex));
+  const preAvgCasualties = avg(pre2022.map((d) => d.casualties));
+  const postAvgCasualties = avg(post2021.map((d) => d.casualties));
+  const cpiShiftPct = preAvgCpi > 0 ? ((postAvgCpi - preAvgCpi) / preAvgCpi) * 100 : 0;
+  const casualtiesShiftPct = preAvgCasualties > 0
+    ? ((postAvgCasualties - preAvgCasualties) / preAvgCasualties) * 100
+    : 0;
+
+  const yearlySpendDiff = dataset.data[dataset.data.length - 1].militarySpendUSD - dataset.data[0].militarySpendUSD;
+  const yearlyCasualtyDiff = dataset.data[dataset.data.length - 1].casualties - dataset.data[0].casualties;
   
   app.innerHTML = `
     <header>
       <h1>The Price of War: Military Spending vs. Human Suffering</h1>
       <p class="subtitle">Interactive Data Story (2018–2024)</p>
     </header>
-    
-    <section class="story-section">
-      <div class="story-text">
-        <h2>What to Notice</h2>
-        <p>
-          This visualization reveals a troubling correlation: as global military expenditures 
-          surge from $775 billion to over $900 billion annually, the human cost accelerates 
-          dramatically. The <strong>2022 inflection point</strong> (highlighted in gold) marks 
-          where spending crossed $850B alongside the Ukraine conflict escalation, triggering 
-          cascading effects across food prices, energy markets, and casualty rates.
-        </p>
-        <p>
-          Toggle between views to see how military resource allocation directly correlates with 
-          either <strong>CPI inflation</strong> (food & energy insecurity) or 
-          <strong>human casualties</strong> (lives lost in conflict zones). Both metrics climb 
-          in lockstep with defense budgets, suggesting that increased militarization compounds 
-          rather than resolves humanitarian crises. The data challenges the narrative that higher 
-          military spending creates stability—instead, it appears to fuel a cycle of economic 
-          strain and human loss.
-        </p>
-        <p class="insight">
-          <strong>Key Insight:</strong> Every $100B increase in military spending corresponds 
-          to a ~15-point CPI surge and approximately 50,000 additional casualties. This isn't 
-          about correlation alone—it's about policies prioritizing weaponry over welfare, 
-          creating feedback loops where conflict drives spending, which intensifies conflict.
-        </p>
-      </div>
-    </section>
-    
-    <section class="chart-section">
-      <div class="controls">
-        <button id="toggle-cpi" class="btn btn-active" data-mode="cpi">
-          View: CPI Impact
-        </button>
-        <button id="toggle-casualties" class="btn" data-mode="casualties">
-          View: Human Casualties
-        </button>
-      </div>
-      
-      <div class="chart-container">
-        <canvas id="main-chart"></canvas>
-      </div>
-      
-      <div class="annotation-note">
-        <strong>Annotation:</strong> 2022 marks the acceleration point (gold dot) where 
-        military spending crossed $850B, correlating with Ukraine conflict and global supply 
-        chain disruptions. This year saw the sharpest single-year increases in both CPI 
-        and casualties since 2018.
-      </div>
-    </section>
-    
-    <section class="summary-cards">
-      <div class="card">
-        <h3>Total Military Spend</h3>
-        <p class="stat">$${dataset.summary.totalMilitarySpend.toLocaleString()}B</p>
-        <p class="label">${dataset.metadata.yearRange.min}–${dataset.metadata.yearRange.max}</p>
-      </div>
-      
-      <div class="card">
-        <h3>Avg CPI Growth</h3>
-        <p class="stat">${dataset.summary.avgCPIGrowth.toFixed(1)}%</p>
-        <p class="label">Food & Energy Index</p>
-      </div>
-      
-      <div class="card">
-        <h3>Total Casualties</h3>
-        <p class="stat">${dataset.summary.totalCasualties.toLocaleString()}</p>
-        <p class="label">Estimated Deaths</p>
-      </div>
+
+    <section class="narrative-nav" aria-label="Story Views">
+      <button class="story-tab story-tab-active" data-story-view="context" aria-controls="view-context">1. Context</button>
+      <button class="story-tab" data-story-view="evidence" aria-controls="view-evidence">2. Evidence</button>
+      <button class="story-tab" data-story-view="counterpoint" aria-controls="view-counterpoint">3. Counterpoint</button>
+      <button class="story-tab" data-story-view="takeaway" aria-controls="view-takeaway">4. Takeaway</button>
     </section>
 
-    <section class="data-table-section">
-      <h2>Dataset Display</h2>
-      <div class="table-wrap">
-        <table class="data-table" aria-label="War cost dataset">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Military Spending ($B)</th>
-              <th>CPI Index</th>
-              <th>Education Gap ($B)</th>
-              <th>Casualties</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${dataset.data.map((d) => `
+    <section id="view-context" class="story-view">
+      <section class="story-section">
+        <div class="story-text">
+          <h2>Context: Why Students Should Care</h2>
+          <p>
+            Students feel global conflict through daily costs: food, transportation, and energy bills rise,
+            while public spending tradeoffs shape school and community resources. This story tracks how
+            military spending, household pressure indicators, and casualties moved together across 2018–2024.
+          </p>
+          <p>
+            The timeline starts before the 2022 escalation and continues through its aftereffects.
+            That gives a clear baseline and a post-shock period for comparison.
+          </p>
+          <p class="insight">
+            <strong>Headline context:</strong> Annual military spending rose by
+            <strong>$${yearlySpendDiff.toLocaleString()}B</strong> across the time window,
+            while annual casualties rose by <strong>${yearlyCasualtyDiff.toLocaleString()}</strong>.
+          </p>
+        </div>
+      </section>
+    </section>
+    
+    <section id="view-evidence" class="story-view" hidden>
+      <section class="story-section">
+        <div class="story-text">
+          <h2>Evidence: Linked Trends Over Time</h2>
+          <p>
+            Use the chart controls to switch between CPI and casualty outcomes against military spending.
+            The same x-axis reveals whether both human and economic stress indicators rise during high-spend years.
+          </p>
+          <p class="insight">
+            <strong>Interaction guidance:</strong> The two line views keep the spending bars constant.
+            This makes it easier to compare how the conclusion changes when the outcome metric changes.
+          </p>
+        </div>
+      </section>
+
+      <section class="chart-section">
+        <div class="controls" role="group" aria-label="Metric toggle">
+          <button id="toggle-cpi" class="btn btn-active" data-mode="cpi">
+            View: CPI Impact
+          </button>
+          <button id="toggle-casualties" class="btn" data-mode="casualties">
+            View: Human Casualties
+          </button>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="main-chart"></canvas>
+        </div>
+
+        <div class="annotation-note">
+          <strong>Annotation:</strong> 2022 marks the acceleration point where spending crossed $850B.
+          That year aligns with the sharpest jumps in both CPI and casualties.
+        </div>
+      </section>
+    </section>
+
+    <section id="view-counterpoint" class="story-view" hidden>
+      <section class="story-section">
+        <div class="story-text">
+          <h2>Counterpoint: Pre vs. Post 2022 Segmentation</h2>
+          <p>
+            A single trend line can hide shifts. This split compares pre-2022 years to 2022+ years.
+            It tests whether the relationship is stable or changes after a major geopolitical inflection.
+          </p>
+        </div>
+      </section>
+
+      <section class="summary-cards">
+        <div class="card">
+          <h3>Average CPI Shift</h3>
+          <p class="stat">${cpiShiftPct.toFixed(1)}%</p>
+          <p class="label">Post-2021 vs. pre-2022 average</p>
+        </div>
+        <div class="card">
+          <h3>Average Casualty Shift</h3>
+          <p class="stat">${casualtiesShiftPct.toFixed(1)}%</p>
+          <p class="label">Post-2021 vs. pre-2022 average</p>
+        </div>
+        <div class="card">
+          <h3>Total Military Spend</h3>
+          <p class="stat">$${dataset.summary.totalMilitarySpend.toLocaleString()}B</p>
+          <p class="label">${dataset.metadata.yearRange.min}–${dataset.metadata.yearRange.max}</p>
+        </div>
+      </section>
+
+      <section class="data-table-section">
+        <h2>Dataset Display</h2>
+        <div class="table-wrap">
+          <table class="data-table" aria-label="War cost dataset">
+            <thead>
               <tr>
-                <td>${d.year}</td>
-                <td>$${d.militarySpendUSD.toLocaleString()}</td>
-                <td>${d.cpiIndex.toFixed(1)}</td>
-                <td>$${d.educationGap.toLocaleString()}</td>
-                <td>${d.casualties.toLocaleString()}</td>
+                <th>Year</th>
+                <th>Military Spending ($B)</th>
+                <th>CPI Index</th>
+                <th>Education Gap ($B)</th>
+                <th>Casualties</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              ${dataset.data.map((d) => `
+                <tr>
+                  <td>${d.year}</td>
+                  <td>$${d.militarySpendUSD.toLocaleString()}</td>
+                  <td>${d.cpiIndex.toFixed(1)}</td>
+                  <td>$${d.educationGap.toLocaleString()}</td>
+                  <td>${d.casualties.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-takeaway" class="story-view" hidden>
+      <section class="story-section">
+        <div class="story-text">
+          <h2>Takeaway: What This Means for Students</h2>
+          <p>
+            The story supports a consistent pattern: rising military expenditure aligns with higher household pressure
+            and higher casualties in this period. Interacting with CPI versus casualties changes the lens,
+            but not the direction of concern.
+          </p>
+          <p>
+            This does <strong>not</strong> prove strict causation. It does show a measurable relationship worth public attention,
+            student discussion, and policy literacy.
+          </p>
+          <p class="insight">
+            <strong>Actionable student takeaway:</strong> Track both budget priorities and cost-of-living indicators when evaluating
+            public policy claims about "security" and "stability."
+          </p>
+        </div>
+      </section>
     </section>
     
     <footer>
@@ -140,11 +208,35 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
   // Initialize chart after DOM is ready
   setTimeout(() => {
     chart = new InteractiveChart('main-chart', dataset);
-    setupInteraction();
+    setupInteraction(dataset);
   }, 0);
 }
 
-function setupInteraction(): void {
+function setupInteraction(dataset: ProcessedDataset): void {
+  void dataset;
+
+  const storyTabs = document.querySelectorAll<HTMLButtonElement>('.story-tab');
+  const storyViews = document.querySelectorAll<HTMLElement>('.story-view');
+
+  const setStoryView = (view: NarrativeView): void => {
+    storyTabs.forEach((tab) => {
+      const isActive = tab.dataset.storyView === view;
+      tab.classList.toggle('story-tab-active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+
+    storyViews.forEach((panel) => {
+      panel.hidden = panel.id !== `view-${view}`;
+    });
+  };
+
+  storyTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.storyView as NarrativeView;
+      setStoryView(view);
+    });
+  });
+
   const cpiBtn = document.getElementById('toggle-cpi');
   const casualtiesBtn = document.getElementById('toggle-casualties');
   

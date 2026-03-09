@@ -139,6 +139,46 @@ h2 {
   max-width: 68ch;
 }
 
+.narrative-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 1.2rem;
+}
+
+.story-tab {
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  border: 2px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+  color: #1c1c1c;
+  border-radius: 999px;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.story-tab:hover {
+  transform: translateY(-1px);
+  background: rgba(10, 75, 179, 0.12);
+}
+
+.story-tab:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.story-tab-active {
+  background: linear-gradient(180deg, #0f4eb8, #093a8d);
+  color: #fbfbfb;
+  border-color: #0f4eb8;
+}
+
+.story-view {
+  margin-bottom: 1.2rem;
+}
+
 .story-section,
 .chart-section {
   background: var(--panel);
@@ -412,6 +452,10 @@ footer {
 }
 
 @media (max-width: 900px) {
+  .narrative-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .summary-cards {
     grid-template-columns: 1fr;
   }
@@ -437,6 +481,10 @@ footer {
 
   h1 {
     font-size: 2rem;
+  }
+
+  .narrative-nav {
+    grid-template-columns: 1fr;
   }
 
   .controls {
