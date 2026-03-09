@@ -5,6 +5,8 @@
 
 import {
   Chart,
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -20,6 +22,8 @@ import type { ProcessedDataset } from './schema';
 
 // Register Chart.js components
 Chart.register(
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   PointElement,
