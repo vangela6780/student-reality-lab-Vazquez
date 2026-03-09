@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "processedAt": "2026-03-09T04:53:21.262Z",
+    "totalRecords": 7,
+    "yearRange": {
+      "min": 2018,
+      "max": 2024
+    },
+    "dataQuality": {
+      "missingValues": 0,
+      "interpolatedValues": 0
+    }
+  },
+  "data": [
+    {
+      "year": 2018,
+      "militarySpendUSD": 712,
+      "cpiIndex": 251.1,
+      "educationGap": 45,
+      "casualties": 120000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2019,
+      "militarySpendUSD": 732,
+      "cpiIndex": 255.7,
+      "educationGap": 48,
+      "casualties": 135000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2020,
+      "militarySpendUSD": 778,
+      "cpiIndex": 258.8,
+      "educationGap": 55,
+      "casualties": 150000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2021,
+      "militarySpendUSD": 801,
+      "cpiIndex": 270.9,
+      "educationGap": 62,
+      "casualties": 185000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2022,
+      "militarySpendUSD": 877,
+      "cpiIndex": 292.5,
+      "educationGap": 75,
+      "casualties": 210000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2023,
+      "militarySpendUSD": 916,
+      "cpiIndex": 304.1,
+      "educationGap": 82,
+      "casualties": 245000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    },
+    {
+      "year": 2024,
+      "militarySpendUSD": 965,
+      "cpiIndex": 315.4,
+      "educationGap": 90,
+      "casualties": 280000,
+      "sourceNotes": "SIPRI/BLS/Costs of War compiled classroom dataset"
+    }
+  ],
+  "summary": {
+    "totalMilitarySpend": 5781,
+    "avgCPIGrowth": 3.9,
+    "totalCasualties": 1325000
+  }
+}
