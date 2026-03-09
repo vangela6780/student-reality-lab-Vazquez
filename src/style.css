@@ -421,6 +421,60 @@ h2 {
   color: #3e3e3e;
 }
 
+.student-callout {
+  background: linear-gradient(135deg, rgba(10, 75, 179, 0.14), rgba(245, 183, 0, 0.18));
+  border: 2px solid var(--blue);
+  border-radius: 12px;
+  padding: 1.4rem;
+  margin: 1.4rem 0;
+  position: relative;
+}
+
+.student-callout::before {
+  content: '💡';
+  position: absolute;
+  top: -12px;
+  right: 1.4rem;
+  font-size: 1.8rem;
+}
+
+.student-callout h3 {
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  color: #043b8f;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.student-callout p {
+  margin-bottom: 0.9rem;
+  color: #1f1f1f;
+  font-size: 1rem;
+}
+
+.student-callout ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.student-callout li {
+  margin-bottom: 0.65rem;
+  padding-left: 1.8rem;
+  position: relative;
+  color: #1f1f1f;
+  font-size: 0.99rem;
+}
+
+.student-callout li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--red);
+  font-weight: bold;
+}
+
 footer {
   text-align: left;
   padding: 1.3rem 1rem 0;

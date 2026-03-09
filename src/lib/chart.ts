@@ -107,7 +107,7 @@ export class InteractiveChart {
         plugins: {
           title: {
             display: true,
-            text: 'Military Spending vs. Human Cost (2018-2024)',
+            text: 'Do Rising Military Budgets Align with Your Rising Costs? (2018-2024)',
             color: '#111111',
             font: { size: 18, weight: 'bold' },
             padding: 20,

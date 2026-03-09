@@ -46,14 +46,19 @@ Primary and supporting sources used for this Phase 1 starter dataset:
    - Usage: CC BY-4.0 for World Bank indicators
 
 ## Data Dictionary (minimum 5 rows: column -> meaning -> units)
-| Column | Meaning | Units |
-|---|---|---|
-| Year | Calendar/fiscal reference year | YYYY |
-| Mil_Spend_USD_Billions | U.S. military expenditure | Billions of current USD |
-| CPI_Food_Energy_Index | Combined classroom index tracking food + energy consumer pressure (derived from BLS CPI series) | Index (base-style, unitless) |
-| Edu_Funding_Gap_Billions | Estimated education opportunity-cost proxy associated with higher defense prioritization in public narratives (project metric) | Billions of USD |
-| Casualties_Est | Estimated direct + indirect conflict-related deaths used for narrative context | People (count) |
-| Source_Notes | Short provenance note for each row | Text |
+
+**VERIFIED DATA** (sourced from established databases):
+| Column | Meaning | Units | Source | Data Quality |
+|---|---|---|---|---|
+| Year | Calendar/fiscal reference year | YYYY | Standard | ✓ Complete |
+| Mil_Spend_USD_Billions | U.S. military expenditure | Billions of current USD | SIPRI Military Expenditure Database | ✓ Verified, official source |
+| CPI_Food_Energy_Index | Combined index tracking food + energy consumer pressure (normalized from BLS CPI series) | Index (unitless; base-year normalized) | U.S. Bureau of Labor Statistics (BLS) | ✓ Verified, public data |
+| Casualties_Est | Estimated direct + indirect conflict-related deaths (includes low/high bounds in source literature) | People (count) | Brown University Costs of War; UCDP | ⚠ Estimated; methodology varies by source |
+
+**PROJECT-DERIVED NARRATIVE METRIC** (for student context; not a federal ledger):
+| Column | Meaning | Units | Purpose | Caveat |
+|---|---|---|---|---|
+| Edu_Funding_Gap_Billions | Proxy metric for public narrative about education opportunity cost relative to defense prioritization | Billions of USD | Illustrative; helps students understand "tradeoff" framing | ⚠ **NOT** a federal accounting value; for classroom narrative only; do not cite as policy fact |
 
 ## Data Viability Audit
 ### Missing values + weird fields
@@ -70,10 +75,13 @@ Primary and supporting sources used for this Phase 1 starter dataset:
 - For missing or delayed casualty estimates, keep nulls and annotate instead of fabricating values.
 
 ### What this dataset cannot prove (limits/bias)
-- It cannot prove war is the sole cause of inflation or tuition pressure.
-- It cannot establish strict causation between defense spending and student cost-of-living stress without controls.
-- Casualty totals are method-dependent and can vary by source methodology.
-- U.S.-focused spending data does not represent all countries equally.
+**Critical limitations (READ BEFORE DRAWING CONCLUSIONS):**
+- **No causal proof**: This dataset does NOT prove military spending *causes* inflation, tuition pressure, or casualty changes. Correlation ≠ causation. Multiple factors (supply chains, geopolitics, pandemic recovery) influence CPI and casualties simultaneously.
+- **U.S. military spending ≠ global conflict cost**: This data tracks U.S. defense budgets only, not how that spending is deployed or its actual impact on the regions at war. It's incomplete for understanding full conflict costs.
+- **Casualties are estimates with uncertainty**: Different methodologies (direct deaths vs. indirect impact via disease/famine) produce different numbers. The "Casualties_Est" field represents one interpretation; other sources may differ by 20-40%.
+- **Student cost-of-living ≠ military spending directly**: Tuition and transportation costs are influenced by many policy choices, not just defense budgets. This data cannot isolate the defense budget's specific role.
+- **Time window matters**: 2018-2024 covers a specific geopolitical period. Extending back or forward would change conclusions.
+- **CPI proxy**: We combined food + energy CPI into one "classroom index" for simplicity. Real student cost-of-living includes housing, healthcare, and childcare—not just food and energy.
 
 ## Draft Chart Screenshot (from Sheets/Excel) + 2 bullets explaining why the chart answers the question
 **Screenshot placeholder:** Add your chart image after importing `data/raw.csv` into Sheets or Excel.
