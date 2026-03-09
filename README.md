@@ -183,3 +183,55 @@ All constants are named and documented in `src/lib/schema.ts`:
 
 ✅ **Type Safety:**  
 Full TypeScript contracts prevent runtime errors. Schema validation at build time ensures data integrity before it reaches the browser.
+
+---
+
+## Phase 4: Full Story (2-4 Views + STAR Narrative)
+
+This app now uses 4 narrative views, each with a specific job:
+
+1. `Context` — frames the student problem and stakes.
+2. `Evidence` — interactive chart with toggles (`CPI` vs `Casualties`).
+3. `Counterpoint` — segmented comparison (`pre-2022` vs `2022+`) and transparent raw table.
+4. `Takeaway` — final claim, caution on causation, and student action.
+
+Required STAR presentation script is included in `PRESENTATION.md`.
+
+---
+
+## Phase 5: Polish + Demo Day
+
+### Accessibility basics
+- Semantic labels on major controls and tables.
+- Visible keyboard focus states on story tabs and metric toggle buttons.
+- High contrast button and text styling.
+
+### Performance basics
+- Data is preprocessed at build-time (`data/processed.json`) to avoid heavy parsing in the browser.
+- Chart updates are scoped to dataset/axis changes rather than full page rerenders.
+
+### Limits & What I'd Do Next
+
+**Current limits:**
+- Correlation does not prove causation.
+- Casualty values are estimated and methodology-dependent.
+- Dataset is short (2018-2024) and U.S.-centered for spending.
+
+**What I'd do next:**
+- Add confidence bands and methodology comparisons for casualty estimates.
+- Add a broader cross-country panel for stronger segmentation.
+- Add statistical controls (energy supply shocks, macro indicators).
+
+### Live demo format (3-5 minutes)
+1. State the claim in one sentence.
+2. Show interaction by toggling chart modes and switching narrative views.
+3. Cite one limitation clearly.
+4. End with one actionable takeaway for students.
+
+---
+
+## Submission Checklist
+
+- Repository link
+- Deployed link (GitHub Pages)
+- 60-second screen recording backup
