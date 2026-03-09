@@ -149,34 +149,6 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
           <p class="label">${dataset.metadata.yearRange.min}–${dataset.metadata.yearRange.max}</p>
         </div>
       </section>
-
-      <section class="data-table-section">
-        <h2>Dataset Display</h2>
-        <div class="table-wrap">
-          <table class="data-table" aria-label="War cost dataset">
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Military Spending ($B)</th>
-                <th>CPI Index</th>
-                <th>Education Gap ($B)</th>
-                <th>Casualties</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${dataset.data.map((d) => `
-                <tr>
-                  <td>${d.year}</td>
-                  <td>$${d.militarySpendUSD.toLocaleString()}</td>
-                  <td>${d.cpiIndex.toFixed(1)}</td>
-                  <td>$${d.educationGap.toLocaleString()}</td>
-                  <td>${d.casualties.toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </section>
 
     <section id="view-takeaway" class="story-view" hidden>
@@ -198,6 +170,34 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
           </p>
         </div>
       </section>
+    </section>
+
+    <section class="data-table-section">
+      <h2>Dataset Display</h2>
+      <div class="table-wrap">
+        <table class="data-table" aria-label="War cost dataset">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Military Spending ($B)</th>
+              <th>CPI Index</th>
+              <th>Education Gap ($B)</th>
+              <th>Casualties</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dataset.data.map((d) => `
+              <tr>
+                <td>${d.year}</td>
+                <td>$${d.militarySpendUSD.toLocaleString()}</td>
+                <td>${d.cpiIndex.toFixed(1)}</td>
+                <td>$${d.educationGap.toLocaleString()}</td>
+                <td>${d.casualties.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
     </section>
     
     <footer>
