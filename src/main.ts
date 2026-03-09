@@ -199,8 +199,10 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </div>
     </section>
     
-    <footer>
-      <p>Data: SIPRI, World Bank, UCDP | Processed: ${new Date(dataset.metadata.processedAt).toLocaleString()}</p>
+    <footer class="site-footer">
+      <p><strong>Data Sources:</strong> SIPRI, World Bank, UCDP</p>
+      <p><strong>Processed:</strong> ${new Date(dataset.metadata.processedAt).toLocaleString()}</p>
+      <p><strong>Project:</strong> Student Reality Lab - Angela Vazquez</p>
     </footer>
   `;
   

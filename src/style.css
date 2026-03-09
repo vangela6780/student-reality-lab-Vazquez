@@ -404,6 +404,14 @@ footer {
   margin-top: 1.25rem;
 }
 
+.site-footer p {
+  margin-bottom: 0.25rem;
+}
+
+.site-footer p:last-child {
+  margin-bottom: 0;
+}
+
 .error {
   text-align: center;
   padding: 2.8rem 1rem;
