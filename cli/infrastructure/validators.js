@@ -74,7 +74,7 @@ class CLIOutputFormatter {
         }
         // Text format
         if (result.success) {
-            let output = `✅ Success`;
+            let output = `Success`;
             if (result.message)
                 output += `: ${result.message}`;
             if (result.data) {
@@ -89,7 +89,7 @@ class CLIOutputFormatter {
             output += `\n\nExecution time: ${result.executionTimeMs}ms`;
             return output;
         }
-        let output = `❌ Error`;
+        let output = `Error`;
         if (result.error)
             output += `: ${result.error}`;
         if (result.message)

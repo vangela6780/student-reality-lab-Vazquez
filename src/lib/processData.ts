@@ -17,7 +17,7 @@ const RAW_CSV_PATH = join(PROJECT_ROOT, 'data', 'raw.csv');
 const PROCESSED_JSON_PATH = join(PROJECT_ROOT, 'data', 'processed.json');
 
 async function main() {
-  console.log('📊 Processing raw data...');
+  console.log('Processing raw data...');
   console.log(`Reading: ${RAW_CSV_PATH}`);
   
   try {
@@ -26,7 +26,7 @@ async function main() {
     
     // Parse and validate
     const dataPoints = parseRawCSV(csvText);
-    console.log(`✅ Parsed ${dataPoints.length} valid data points`);
+    console.log(`Parsed ${dataPoints.length} valid data points`);
     
     // Transform to final contract
     const processed = transformToProcessed(dataPoints);
@@ -38,7 +38,7 @@ async function main() {
       'utf-8'
     );
     
-    console.log(`✅ Wrote processed data to: ${PROCESSED_JSON_PATH}`);
+    console.log(`Wrote processed data to: ${PROCESSED_JSON_PATH}`);
     console.log('\n📈 Summary:');
     console.log(`  Years: ${processed.metadata.yearRange.min} - ${processed.metadata.yearRange.max}`);
     console.log(`  Records: ${processed.metadata.totalRecords}`);
@@ -47,7 +47,7 @@ async function main() {
     console.log(`  Avg CPI Growth: ${processed.summary.avgCPIGrowth}% per year`);
     
   } catch (error) {
-    console.error('❌ Error processing data:', error);
+    console.error('Error processing data:', error);
     process.exit(1);
   }
 }

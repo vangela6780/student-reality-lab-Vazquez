@@ -129,11 +129,11 @@ The CLI starts even if AI keys are missing. AI-only plugins are skipped with war
 5. **Output:** `data/processed.json` (typed, validated, ready for UI consumption)
 
 **Data Quality Checks:**
-- ✅ No missing values in current dataset
-- ✅ All years sequential and ascending
-- ✅ No anomalies detected (no >50% year-over-year jumps)
-- ⚠️ Casualties are estimates (see provenance notes)
-- ⚠️ CPI is a derived index, not a single BLS series
+- No missing values in current dataset
+- All years sequential and ascending
+- No anomalies detected (no >50% year-over-year jumps)
+- Caution: Casualties are estimates (see provenance notes)
+- Caution: CPI is a derived index, not a single BLS series
 
 **Run the pipeline:**
 ```bash
@@ -167,21 +167,21 @@ The TypeScript interface (`ProcessedDataset` in `src/lib/schema.ts`) that guaran
 
 ### Phase 2 Engineering Acceptance
 
-✅ **Build Commands Work:**
+**Build Commands Work:**
 ```bash
 npm run dev          # Launches Vite dev server at http://localhost:5173
 npm run build        # Compiles TypeScript, bundles with Vite → build/
 npm run process-data # Regenerates data/processed.json from raw CSV
 ```
 
-✅ **No Magic Numbers:**  
+**No Magic Numbers:**  
 All constants are named and documented in `src/lib/schema.ts`:
 - `CPI_BASE_YEAR = 2018`
 - `MIN_VALID_YEAR = 2000`
 - `MAX_VALID_YEAR = 2030`
 - `ANOMALY_THRESHOLD_PCT = 50`
 
-✅ **Type Safety:**  
+**Type Safety:**  
 Full TypeScript contracts prevent runtime errors. Schema validation at build time ensures data integrity before it reaches the browser.
 
 ---
