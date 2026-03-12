@@ -243,3 +243,39 @@ Required STAR presentation script is included in `PRESENTATION.md`.
 - Repository link
 - Deployed link (GitHub Pages)
 - 60-second screen recording backup
+
+## AI Chat API Setup (No Frontend Fallback)
+
+Quick start (recommended):
+
+```bash
+npm.cmd install
+npm.cmd run dev:all
+```
+
+This launches both the Vite site and the Next.js chat API together.
+
+To use real chat responses in the website AI panel, run both apps locally:
+
+1. Start the Next API backend:
+```bash
+cd ai-orchestration-nextjs
+npm.cmd install
+copy .env.example .env.local
+```
+Add your key to `ai-orchestration-nextjs/.env.local`:
+```env
+OPENAI_API_KEY=your_real_key
+```
+Then run:
+```bash
+npm.cmd run dev
+```
+
+2. Start this Vite website (second terminal):
+```bash
+cd ..
+npm.cmd run dev
+```
+
+Local proxy is configured in `vite.config.ts` so `'/api/chat'` routes to `http://localhost:3000/api/chat` during development.

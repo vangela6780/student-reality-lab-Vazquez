@@ -4,3 +4,5 @@ build/
 *.log
 .DS_Store
 Thumbs.db
+ai-orchestration-nextjs/.next/
+ai-orchestration-nextjs/.env.local

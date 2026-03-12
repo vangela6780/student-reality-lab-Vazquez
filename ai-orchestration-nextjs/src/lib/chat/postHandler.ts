@@ -91,8 +91,15 @@ export function createChatPostHandler(deps: ChatHandlerDeps) {
             const prompt = toolSummary
               ? `User: ${message}\n\nTool Output:\n${toolSummary}\n\nRespond using the tool output when useful.`
               : message;
+            let deltaCount = 0;
             for await (const delta of deps.streamModelText(prompt)) {
+              deltaCount += 1;
               write('text_delta', { text: delta });
+            }
+            if (deltaCount === 0) {
+              write('text_delta', {
+                text: 'No model output was returned. Verify OPENAI_API_KEY in ai-orchestration-nextjs/.env.local and try again.',
+              });
             }
           } else {
             for await (const delta of fallbackText(message)) {
