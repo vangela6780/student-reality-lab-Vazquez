@@ -79,6 +79,35 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       <a href="#dataset" class="story-link">Dataset</a>
     </nav>
 
+    <section id="ai-assistant" class="story-view">
+      <section class="story-section ai-panel">
+        <div class="story-text">
+          <h2>AI Assistant: MCP-Style Orchestration</h2>
+          <p>
+            Ask for summaries or tool-oriented prompts like "list tools" or "use filesystem tool".
+            If no API backend is available, a local fallback responder is used so the interface still works.
+          </p>
+        </div>
+
+        <div class="ai-status-wrap">
+          <span class="ai-status-label">Tool Status</span>
+          <span id="tool-status-badge" class="tool-status tool-status-idle">Idle</span>
+        </div>
+
+        <div id="ai-chat-log" class="ai-chat-log" aria-live="polite"></div>
+
+        <div id="approval-box" class="approval-box" hidden>
+          <p id="approval-text"></p>
+          <button id="approve-btn" class="btn" type="button">Approve Tool Action</button>
+        </div>
+
+        <form id="ai-chat-form" class="ai-chat-form">
+          <input id="ai-chat-input" class="ai-chat-input" type="text" placeholder="Send a prompt..." required />
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </section>
+    </section>
+
     <section id="context" class="story-view">
       <section class="story-section">
         <div class="story-text">
@@ -212,35 +241,6 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
             public policy claims about "security" and "stability." The two are connected.
           </p>
         </div>
-      </section>
-    </section>
-
-    <section id="ai-assistant" class="story-view">
-      <section class="story-section ai-panel">
-        <div class="story-text">
-          <h2>AI Assistant: MCP-Style Orchestration</h2>
-          <p>
-            Ask for summaries or tool-oriented prompts like "list tools" or "use filesystem tool".
-            If no API backend is available, a local fallback responder is used so the interface still works.
-          </p>
-        </div>
-
-        <div class="ai-status-wrap">
-          <span class="ai-status-label">Tool Status</span>
-          <span id="tool-status-badge" class="tool-status tool-status-idle">Idle</span>
-        </div>
-
-        <div id="ai-chat-log" class="ai-chat-log" aria-live="polite"></div>
-
-        <div id="approval-box" class="approval-box" hidden>
-          <p id="approval-text"></p>
-          <button id="approve-btn" class="btn" type="button">Approve Tool Action</button>
-        </div>
-
-        <form id="ai-chat-form" class="ai-chat-form">
-          <input id="ai-chat-input" class="ai-chat-input" type="text" placeholder="Send a prompt..." required />
-          <button class="btn" type="submit">Send</button>
-        </form>
       </section>
     </section>
 
