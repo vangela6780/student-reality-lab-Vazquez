@@ -279,3 +279,19 @@ npm.cmd run dev
 ```
 
 Local proxy is configured in `vite.config.ts` so `'/api/chat'` routes to `http://localhost:3000/api/chat` during development.
+
+## GitHub Pages: Make AI Chat Work Online
+
+GitHub Pages is static hosting, so it cannot run the Next.js `/api/chat` backend directly.
+
+To make chat work on the deployed site:
+
+1. Deploy the backend app in `ai-orchestration-nextjs/` to a server host (recommended: Vercel, Render, or Railway).
+2. Copy your live backend API URL, for example:
+   - `https://your-backend-domain.com/api/chat`
+3. In GitHub repository settings, create a repository variable:
+   - Name: `VITE_CHAT_API_URL`
+   - Value: your full backend `/api/chat` URL
+4. Push to `main` again (or rerun the Pages workflow). The build workflow injects this variable automatically.
+
+After deploy, the Pages frontend will call your hosted backend URL for AI chat.
