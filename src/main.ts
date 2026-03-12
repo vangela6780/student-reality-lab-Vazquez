@@ -71,11 +71,11 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
     </header>
 
     <nav class="story-navbar" aria-label="Story navigation">
+      <a href="#ai-assistant" class="story-link">AI Assistant</a>
       <a href="#context" class="story-link">Context</a>
       <a href="#evidence" class="story-link">Evidence</a>
       <a href="#counterpoint" class="story-link">Counterpoint</a>
       <a href="#takeaway" class="story-link">Takeaway</a>
-      <a href="#ai-assistant" class="story-link">AI Assistant</a>
       <a href="#dataset" class="story-link">Dataset</a>
     </nav>
 
