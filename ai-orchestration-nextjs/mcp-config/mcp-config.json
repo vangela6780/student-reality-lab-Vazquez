@@ -1,0 +1,18 @@
+{
+  "servers": [
+    {
+      "id": "filesystem-local",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "capabilities": {
+        "defaultMode": "read-only",
+        "requiresConfirmationFor": ["write", "delete", "move"]
+      },
+      "timeouts": {
+        "connectMs": 5000,
+        "toolCallMs": 15000
+      }
+    }
+  ]
+}

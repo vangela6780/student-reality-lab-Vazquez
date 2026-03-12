@@ -1,0 +1,32 @@
+{
+  "servers": [
+    {
+      "id": "filesystem-local",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "capabilities": {
+        "defaultMode": "read-only",
+        "requiresConfirmationFor": ["write", "delete", "move"]
+      },
+      "timeouts": {
+        "connectMs": 5000,
+        "toolCallMs": 15000
+      }
+    },
+    {
+      "id": "fetch-http",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "capabilities": {
+        "defaultMode": "read-only",
+        "requiresConfirmationFor": []
+      },
+      "timeouts": {
+        "connectMs": 5000,
+        "toolCallMs": 15000
+      }
+    }
+  ]
+}
