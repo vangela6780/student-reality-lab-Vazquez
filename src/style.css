@@ -475,6 +475,130 @@ h2 {
   font-weight: bold;
 }
 
+.ai-panel {
+  border-style: dashed;
+}
+
+.ai-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.ai-status-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #343434;
+  font-weight: 600;
+}
+
+.tool-status {
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.22rem 0.72rem;
+  font-size: 0.9rem;
+}
+
+.tool-status-idle {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.tool-status-thinking {
+  background: rgba(10, 75, 179, 0.14);
+}
+
+.tool-status-tool-running {
+  background: rgba(245, 183, 0, 0.38);
+}
+
+.tool-status-error {
+  background: rgba(190, 32, 38, 0.18);
+}
+
+.ai-chat-log {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.74);
+  min-height: 220px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.ai-msg {
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+.ai-msg:last-child {
+  margin-bottom: 0;
+}
+
+.ai-msg-role {
+  display: inline-block;
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  color: #393939;
+  margin-bottom: 0.2rem;
+}
+
+.ai-msg-user {
+  background: rgba(10, 75, 179, 0.12);
+}
+
+.ai-msg-assistant {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.ai-msg-tool {
+  background: rgba(245, 183, 0, 0.28);
+}
+
+.ai-msg p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1e1e1e;
+  white-space: pre-wrap;
+}
+
+.approval-box {
+  border: 2px solid var(--red);
+  border-radius: 10px;
+  background: rgba(190, 32, 38, 0.08);
+  padding: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.approval-box p {
+  margin-bottom: 0.6rem;
+}
+
+.ai-chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.65rem;
+}
+
+.ai-chat-input {
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  font: inherit;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.ai-chat-input:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
 footer {
   text-align: center;
   padding: 1.3rem 1rem 0;
@@ -589,6 +713,10 @@ footer {
 
   .chart-container {
     height: 360px;
+  }
+
+  .ai-chat-form {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -1,0 +1,32 @@
+{
+  "servers": [
+    {
+      "id": "filesystem-local",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "capabilities": {
+        "defaultMode": "read-only",
+        "requiresConfirmationFor": ["write", "delete", "move"]
+      },
+      "timeouts": {
+        "connectMs": 5000,
+        "toolCallMs": 15000
+      }
+    },
+    {
+      "id": "sqlite-local",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./data/local.db"],
+      "capabilities": {
+        "defaultMode": "read-write",
+        "requiresConfirmationFor": ["write", "delete", "move"]
+      },
+      "timeouts": {
+        "connectMs": 6000,
+        "toolCallMs": 20000
+      }
+    }
+  ]
+}

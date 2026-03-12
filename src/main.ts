@@ -9,6 +9,18 @@ import type { ProcessedDataset } from './lib/schema';
 
 let chart: InteractiveChart | null = null;
 
+type ToolState = 'idle' | 'thinking' | 'tool-running' | 'error';
+
+type PendingApproval = {
+  toolName: string;
+  reason: string;
+};
+
+type SSEEvent = {
+  event: string;
+  data: Record<string, unknown>;
+};
+
 // Load and display interactive visualization
 loadProcessedData()
   .then((dataset: ProcessedDataset) => {
@@ -63,6 +75,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       <a href="#evidence" class="story-link">Evidence</a>
       <a href="#counterpoint" class="story-link">Counterpoint</a>
       <a href="#takeaway" class="story-link">Takeaway</a>
+      <a href="#ai-assistant" class="story-link">AI Assistant</a>
       <a href="#dataset" class="story-link">Dataset</a>
     </nav>
 
@@ -202,6 +215,35 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
       </section>
     </section>
 
+    <section id="ai-assistant" class="story-view">
+      <section class="story-section ai-panel">
+        <div class="story-text">
+          <h2>AI Assistant: MCP-Style Orchestration</h2>
+          <p>
+            Ask for summaries or tool-oriented prompts like "list tools" or "use filesystem tool".
+            If no API backend is available, a local fallback responder is used so the interface still works.
+          </p>
+        </div>
+
+        <div class="ai-status-wrap">
+          <span class="ai-status-label">Tool Status</span>
+          <span id="tool-status-badge" class="tool-status tool-status-idle">Idle</span>
+        </div>
+
+        <div id="ai-chat-log" class="ai-chat-log" aria-live="polite"></div>
+
+        <div id="approval-box" class="approval-box" hidden>
+          <p id="approval-text"></p>
+          <button id="approve-btn" class="btn" type="button">Approve Tool Action</button>
+        </div>
+
+        <form id="ai-chat-form" class="ai-chat-form">
+          <input id="ai-chat-input" class="ai-chat-input" type="text" placeholder="Send a prompt..." required />
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </section>
+    </section>
+
     <section id="dataset" class="data-table-section">
       <h2>Dataset Display</h2>
       <div class="table-wrap">
@@ -295,4 +337,158 @@ function setupInteraction(dataset: ProcessedDataset): void {
   });
 
   updateChartInfo('cpi');
+
+  setupChatInterface();
+}
+
+function setupChatInterface(): void {
+  const form = document.getElementById('ai-chat-form') as HTMLFormElement | null;
+  const input = document.getElementById('ai-chat-input') as HTMLInputElement | null;
+  const log = document.getElementById('ai-chat-log') as HTMLDivElement | null;
+  const badge = document.getElementById('tool-status-badge') as HTMLSpanElement | null;
+  const approvalBox = document.getElementById('approval-box') as HTMLDivElement | null;
+  const approvalText = document.getElementById('approval-text') as HTMLParagraphElement | null;
+  const approveBtn = document.getElementById('approve-btn') as HTMLButtonElement | null;
+
+  if (!form || !input || !log || !badge || !approvalBox || !approvalText || !approveBtn) return;
+
+  const apiUrl = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_CHAT_API_URL ?? '/api/chat';
+
+  let pendingApproval: PendingApproval | null = null;
+  let lastPrompt = '';
+  let assistantBuffer = '';
+
+  const appendMessage = (role: 'user' | 'assistant' | 'tool', text: string): void => {
+    const item = document.createElement('div');
+    item.className = `ai-msg ai-msg-${role}`;
+    item.innerHTML = `<span class="ai-msg-role">${role}</span><p>${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`;
+    log.appendChild(item);
+    log.scrollTop = log.scrollHeight;
+  };
+
+  const replaceAssistantDraft = (text: string): void => {
+    const last = log.querySelector('.ai-msg-assistant:last-child p');
+    if (last) {
+      last.textContent = text;
+      log.scrollTop = log.scrollHeight;
+    }
+  };
+
+  const setToolState = (state: ToolState): void => {
+    badge.className = `tool-status tool-status-${state}`;
+    if (state === 'thinking') badge.textContent = 'Thinking';
+    if (state === 'tool-running') badge.textContent = 'Using Tool';
+    if (state === 'error') badge.textContent = 'Error';
+    if (state === 'idle') badge.textContent = 'Idle';
+  };
+
+  const parseSSE = (packet: string): SSEEvent[] => {
+    return packet
+      .split('\n\n')
+      .map((chunk) => chunk.trim())
+      .filter(Boolean)
+      .map((chunk) => {
+        const lines = chunk.split('\n');
+        const event = lines.find((line) => line.startsWith('event:'))?.replace('event:', '').trim() ?? 'message';
+        const dataRaw = lines.find((line) => line.startsWith('data:'))?.replace('data:', '').trim() ?? '{}';
+        try {
+          return { event, data: JSON.parse(dataRaw) as Record<string, unknown> };
+        } catch {
+          return { event: 'error', data: { message: 'Invalid stream payload.' } };
+        }
+      });
+  };
+
+  const runFallback = (prompt: string): void => {
+    setToolState('thinking');
+    appendMessage('assistant', `Fallback mode active. You said: ${prompt}`);
+    setToolState('idle');
+  };
+
+  const runRequest = async (prompt: string, approved: boolean): Promise<void> => {
+    lastPrompt = prompt;
+    assistantBuffer = '';
+    appendMessage('user', prompt);
+    appendMessage('assistant', '');
+    setToolState('thinking');
+    approvalBox.hidden = true;
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt, pendingApproval: { approved } }),
+      });
+
+      if (!response.ok || !response.body) {
+        runFallback(prompt);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+
+        if (!buffer.includes('\n\n')) continue;
+        const segments = buffer.split('\n\n');
+        buffer = segments.pop() ?? '';
+
+        for (const event of parseSSE(segments.join('\n\n'))) {
+          if (event.event === 'status') {
+            const state = event.data.state as ToolState | undefined;
+            if (state) setToolState(state);
+          }
+
+          if (event.event === 'text_delta') {
+            assistantBuffer += String(event.data.text ?? '');
+            replaceAssistantDraft(assistantBuffer);
+          }
+
+          if (event.event === 'tool_result') {
+            appendMessage('tool', String(event.data.content ?? 'Tool returned no output.'));
+          }
+
+          if (event.event === 'approval_required') {
+            pendingApproval = {
+              toolName: String(event.data.toolName ?? 'tool'),
+              reason: String(event.data.reason ?? 'Approval required for this action.'),
+            };
+            approvalText.textContent = `Approval required for ${pendingApproval.toolName}: ${pendingApproval.reason}`;
+            approvalBox.hidden = false;
+          }
+
+          if (event.event === 'error') {
+            appendMessage('assistant', `Error: ${String(event.data.message ?? 'Unknown error')}`);
+            setToolState('error');
+          }
+
+          if (event.event === 'done') {
+            setToolState('idle');
+          }
+        }
+      }
+    } catch {
+      runFallback(prompt);
+    }
+  };
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const prompt = input.value.trim();
+    if (!prompt) return;
+    input.value = '';
+    await runRequest(prompt, false);
+  });
+
+  approveBtn.addEventListener('click', async () => {
+    if (!pendingApproval) return;
+    approvalBox.hidden = true;
+    await runRequest(lastPrompt, true);
+    pendingApproval = null;
+  });
 }
