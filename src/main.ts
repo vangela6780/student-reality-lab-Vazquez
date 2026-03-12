@@ -338,10 +338,10 @@ function setupInteraction(dataset: ProcessedDataset): void {
 
   updateChartInfo('cpi');
 
-  setupChatInterface();
+  setupChatInterface(dataset);
 }
 
-function setupChatInterface(): void {
+function setupChatInterface(dataset: ProcessedDataset): void {
   const form = document.getElementById('ai-chat-form') as HTMLFormElement | null;
   const input = document.getElementById('ai-chat-input') as HTMLInputElement | null;
   const log = document.getElementById('ai-chat-log') as HTMLDivElement | null;
@@ -399,22 +399,60 @@ function setupChatInterface(): void {
       });
   };
 
-  const runFallback = (prompt: string): void => {
+  const offlineAssistantReply = (prompt: string): string => {
     const lowered = prompt.toLowerCase();
-    if (lowered.includes('summary') || lowered.includes('summarize')) {
-      appendMessage(
-        'assistant',
-        'This website is an interactive data story about the cost of war (2018-2024), showing how military spending trends align with household pressure indicators (food/energy CPI) and estimated casualties. It guides viewers through Context, Evidence, Counterpoint, and Takeaway sections, includes chart toggles for CPI vs. casualties, and ends with a student-focused call to action about civic and policy literacy.'
-      );
-      setToolState('idle');
-      return;
+    const firstYear = dataset.metadata.yearRange.min;
+    const lastYear = dataset.metadata.yearRange.max;
+    const first = dataset.data[0];
+    const last = dataset.data[dataset.data.length - 1];
+    const spendDelta = last.militarySpendUSD - first.militarySpendUSD;
+    const casualtyDelta = last.casualties - first.casualties;
+    const cpiDelta = last.cpiIndex - first.cpiIndex;
+
+    if (lowered.includes('tool') || lowered.includes('list tools')) {
+      return [
+        'Offline mode tool catalog (demo):',
+        '- summarize_story: summarize key narrative findings',
+        '- dataset_stats: return spending/CPI/casualty changes',
+        '- compare_periods: compare pre-2022 vs post-2021 trends',
+        '- explain_limits: list correlation and data limitations',
+        '',
+        'Note: full MCP tool execution requires a live backend API.',
+      ].join('\n');
     }
 
-    setToolState('error');
-    appendMessage(
-      'assistant',
-      `Live API is unavailable in this environment, so local fallback mode answered instead.\n\nYou said: ${prompt}\n\nFor full tool-enabled AI chat in development, run \"npm.cmd run dev:all\".`
-    );
+    if (lowered.includes('summary') || lowered.includes('summarize')) {
+      return 'This website is an interactive data story about war costs from 2018-2024, showing military spending alongside CPI pressure and casualties. It uses Context, Evidence, Counterpoint, and Takeaway sections to argue that higher spending years align with higher household and human costs, while clearly noting correlation limits.';
+    }
+
+    if (lowered.includes('cpi') || lowered.includes('inflation') || lowered.includes('price')) {
+      return `CPI in this dataset rises by ${cpiDelta.toFixed(1)} points from ${firstYear} to ${lastYear}, with the strongest increases after 2022.`;
+    }
+
+    if (lowered.includes('casual') || lowered.includes('human')) {
+      return `Estimated annual casualties increase by ${casualtyDelta.toLocaleString()} between ${firstYear} and ${lastYear}, with sharper increases in the post-2021 period.`;
+    }
+
+    if (lowered.includes('spend') || lowered.includes('budget') || lowered.includes('military')) {
+      return `Military spending increases by $${spendDelta.toLocaleString()}B from ${firstYear} to ${lastYear}. Total spend in the dataset is $${dataset.summary.totalMilitarySpend.toLocaleString()}B.`;
+    }
+
+    if (lowered.includes('limit') || lowered.includes('bias') || lowered.includes('causal')) {
+      return 'Key limits: the dataset is correlational (not causal), casualties are estimated with methodological uncertainty, and the window is short (2018-2024) with U.S.-centered spending context.';
+    }
+
+    return [
+      'I can answer this in offline mode using the site dataset.',
+      '',
+      `Quick snapshot: military spending +$${spendDelta.toLocaleString()}B, CPI +${cpiDelta.toFixed(1)}, casualties +${casualtyDelta.toLocaleString()} (${firstYear}-${lastYear}).`,
+      '',
+      'Try prompts like "summarize the site", "show CPI trend", "show casualty trend", "list tools", or "what are the data limits".',
+    ].join('\n');
+  };
+
+  const runFallback = (prompt: string): void => {
+    setToolState('thinking');
+    appendMessage('assistant', offlineAssistantReply(prompt));
     setToolState('idle');
   };
 
