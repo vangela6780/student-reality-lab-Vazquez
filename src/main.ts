@@ -400,8 +400,21 @@ function setupChatInterface(): void {
   };
 
   const runFallback = (prompt: string): void => {
-    setToolState('thinking');
-    appendMessage('assistant', `Fallback mode active. You said: ${prompt}`);
+    const lowered = prompt.toLowerCase();
+    if (lowered.includes('summary') || lowered.includes('summarize')) {
+      appendMessage(
+        'assistant',
+        'This website is an interactive data story about the cost of war (2018-2024), showing how military spending trends align with household pressure indicators (food/energy CPI) and estimated casualties. It guides viewers through Context, Evidence, Counterpoint, and Takeaway sections, includes chart toggles for CPI vs. casualties, and ends with a student-focused call to action about civic and policy literacy.'
+      );
+      setToolState('idle');
+      return;
+    }
+
+    setToolState('error');
+    appendMessage(
+      'assistant',
+      `Live API is unavailable in this environment, so local fallback mode answered instead.\n\nYou said: ${prompt}\n\nFor full tool-enabled AI chat in development, run \"npm.cmd run dev:all\".`
+    );
     setToolState('idle');
   };
 

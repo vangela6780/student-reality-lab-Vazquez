@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "npm --prefix ai-orchestration-nextjs run dev",
+    "dev:all": "concurrently \"npm:dev\" \"npm:dev:api\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "process-data": "tsx src/lib/processData.ts",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "concurrently": "^9.1.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"

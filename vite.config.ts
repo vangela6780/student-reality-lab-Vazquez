@@ -5,6 +5,15 @@ export default defineConfig({
   base: '/student-reality-lab-Vazquez/',
   root: './',
   publicDir: 'public',
+  server: {
+    // During local development, forward chat calls to the Next.js API backend.
+    proxy: {
+      '/api/chat': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     outDir: 'build',
     emptyOutDir: true,
