@@ -507,11 +507,10 @@ function setupChatInterface(dataset: ProcessedDataset): void {
   };
 
   const get_live_war_update = async (query: string): Promise<LiveWarUpdatePayload> => {
-    const openSearchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&limit=3&namespace=0&format=json&search=${encodeURIComponent(query)}`;
+    const openSearchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&limit=3&namespace=0&format=json&search=${encodeURIComponent(query)}`;
     const searchResponse = await fetch(openSearchUrl, {
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'student-reality-lab-war-impact/1.0',
       },
     });
 
@@ -540,7 +539,6 @@ function setupChatInterface(dataset: ProcessedDataset): void {
         const summaryResponse = await fetch(summaryUrl, {
           headers: {
             Accept: 'application/json',
-            'User-Agent': 'student-reality-lab-war-impact/1.0',
           },
         });
 
