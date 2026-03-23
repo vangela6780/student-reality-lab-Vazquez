@@ -6,6 +6,7 @@ import './style.css';
 import { loadProcessedData } from './lib/loadData';
 import { InteractiveChart, type ViewMode } from './lib/chart';
 import type { ProcessedDataset } from './lib/schema';
+import { Chart, type ChartType } from 'chart.js/auto';
 
 let chart: InteractiveChart | null = null;
 
@@ -19,6 +20,19 @@ type PendingApproval = {
 type SSEEvent = {
   event: string;
   data: Record<string, unknown>;
+};
+
+type ImpactDataPoint = {
+  year: number;
+  cpiIndex: number;
+  casualties: number;
+  educationGap?: number;
+};
+
+type ToolPayload = {
+  years: string[];
+  values: number[];
+  risePct: number;
 };
 
 // Load and display interactive visualization
@@ -357,6 +371,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
   let pendingApproval: PendingApproval | null = null;
   let lastPrompt = '';
   let assistantBuffer = '';
+  let cachedImpactData: ImpactDataPoint[] | null = null;
 
   const appendMessage = (role: 'user' | 'assistant' | 'tool', text: string): void => {
     const item = document.createElement('div');
@@ -364,6 +379,25 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     item.innerHTML = `<span class="ai-msg-role">${role}</span><p>${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`;
     log.appendChild(item);
     log.scrollTop = log.scrollHeight;
+  };
+
+  const appendChartMessage = (title: string): HTMLCanvasElement => {
+    const item = document.createElement('div');
+    item.className = 'ai-msg ai-msg-assistant ai-msg-chart';
+    item.innerHTML = `
+      <span class="ai-msg-role">assistant</span>
+      <p>${title.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+      <div class="chat-chart-wrap">
+        <canvas class="chat-inline-chart" aria-label="${title.replace(/"/g, '&quot;')}"></canvas>
+      </div>
+    `;
+    log.appendChild(item);
+    log.scrollTop = log.scrollHeight;
+    const canvas = item.querySelector('canvas');
+    if (!canvas) {
+      throw new Error('Chart canvas missing from assistant response.');
+    }
+    return canvas;
   };
 
   const replaceAssistantDraft = (text: string): void => {
@@ -380,6 +414,121 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     if (state === 'tool-running') badge.textContent = 'Using Tool';
     if (state === 'error') badge.textContent = 'Error';
     if (state === 'idle') badge.textContent = 'Idle';
+  };
+
+  const withFollowUp = (content: string, followUp: string): string => {
+    const trimmed = content.trim();
+    return `${trimmed}\n\n${followUp}`;
+  };
+
+  const getRisePct = (values: number[]): number => {
+    if (values.length < 2 || values[0] === 0) return 0;
+    return ((values[values.length - 1] - values[0]) / values[0]) * 100;
+  };
+
+  const mapFallbackImpactData = (): ImpactDataPoint[] => {
+    return dataset.data.map((point) => ({
+      year: point.year,
+      cpiIndex: point.cpiIndex,
+      casualties: point.casualties,
+      educationGap: point.educationGap,
+    }));
+  };
+
+  const loadImpactDataset = async (): Promise<ImpactDataPoint[]> => {
+    if (cachedImpactData) return cachedImpactData;
+
+    const response = await fetch(`${import.meta.env.BASE_URL}data/impact-dataset.json`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch impact dataset: ${response.status}`);
+    }
+
+    const data = (await response.json()) as ImpactDataPoint[];
+    cachedImpactData = data;
+    return data;
+  };
+
+  const get_cpi_data = async (): Promise<ToolPayload> => {
+    try {
+      const rows = await loadImpactDataset();
+      const years = rows.map((row) => String(row.year));
+      const values = rows.map((row) => row.cpiIndex);
+      return { years, values, risePct: getRisePct(values) };
+    } catch {
+      const fallbackRows = mapFallbackImpactData();
+      const years = fallbackRows.map((row) => String(row.year));
+      const values = fallbackRows.map((row) => row.cpiIndex);
+      return { years, values, risePct: getRisePct(values) };
+    }
+  };
+
+  const get_casualty_stats = async (): Promise<ToolPayload> => {
+    try {
+      const rows = await loadImpactDataset();
+      const years = rows.map((row) => String(row.year));
+      const values = rows.map((row) => row.casualties);
+      return { years, values, risePct: getRisePct(values) };
+    } catch {
+      const fallbackRows = mapFallbackImpactData();
+      const years = fallbackRows.map((row) => String(row.year));
+      const values = fallbackRows.map((row) => row.casualties);
+      return { years, values, risePct: getRisePct(values) };
+    }
+  };
+
+  const render_chart = (payload: ToolPayload, label: string, type: ChartType): void => {
+    const canvas = appendChartMessage(`${label} (${payload.years[0]}-${payload.years[payload.years.length - 1]})`);
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Unable to render chart context.');
+    }
+
+    const isCasualty = label.toLowerCase().includes('casual');
+    const borderColor = isCasualty ? 'rgba(190, 32, 38, 1)' : 'rgba(10, 75, 179, 1)';
+    const backgroundColor = isCasualty ? 'rgba(190, 32, 38, 0.2)' : 'rgba(10, 75, 179, 0.2)';
+
+    new Chart(context, {
+      type,
+      data: {
+        labels: payload.years,
+        datasets: [
+          {
+            label,
+            data: payload.values,
+            borderColor,
+            backgroundColor,
+            borderWidth: 2,
+            fill: type === 'line',
+            tension: 0.3,
+            pointRadius: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#1f1f1f',
+              font: {
+                size: 11,
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            ticks: {
+              callback: (value) => {
+                if (!isCasualty) return String(value);
+                return Number(value).toLocaleString();
+              },
+            },
+          },
+        },
+      },
+    });
   };
 
   const parseSSE = (packet: string): SSEEvent[] => {
@@ -409,57 +558,129 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     const casualtyDelta = last.casualties - first.casualties;
     const cpiDelta = last.cpiIndex - first.cpiIndex;
 
+    if (/^(hi|hello|hey)\b/.test(lowered)) {
+      return 'Hello! I\'m your War Impact Analyst. I can help you visualize the economic and human costs of conflict. Would you like to see a trend of the Cost of Living (CPI) or casualty data?';
+    }
+
     if (lowered.includes('tool') || lowered.includes('list tools')) {
-      return [
-        'Offline mode tool catalog (demo):',
-        '- summarize_story: summarize key narrative findings',
-        '- dataset_stats: return spending/CPI/casualty changes',
-        '- compare_periods: compare pre-2022 vs post-2021 trends',
-        '- explain_limits: list correlation and data limitations',
-        '',
-        'Note: full MCP tool execution requires a live backend API.',
-      ].join('\n');
+      return withFollowUp(
+        [
+          'Available local tools:',
+          '- get_cpi_data(): retrieves CPI trend data',
+          '- get_casualty_stats(): retrieves casualty trend data',
+          '- render_chart(data, label, type): renders a Chart.js chart in chat',
+        ].join('\n'),
+        'Would you like me to run get_cpi_data() or get_casualty_stats() next?'
+      );
     }
 
     if (lowered.includes('summary') || lowered.includes('summarize')) {
-      return 'This website is an interactive data story about war costs from 2018-2024, showing military spending alongside CPI pressure and casualties. It uses Context, Evidence, Counterpoint, and Takeaway sections to argue that higher spending years align with higher household and human costs, while clearly noting correlation limits.';
+      return withFollowUp(
+        'This website is an interactive data story about war costs from 2018-2024, showing military spending alongside CPI pressure and casualties. It uses Context, Evidence, Counterpoint, and Takeaway sections to argue that higher spending years align with higher household and human costs, while clearly noting correlation limits.',
+        'Would you like a CPI trend chart or a casualty trend chart next?'
+      );
     }
 
     if (lowered.includes('cpi') || lowered.includes('inflation') || lowered.includes('price')) {
-      return `CPI in this dataset rises by ${cpiDelta.toFixed(1)} points from ${firstYear} to ${lastYear}, with the strongest increases after 2022.`;
+      return withFollowUp(
+        `CPI in this dataset rises by ${cpiDelta.toFixed(1)} points from ${firstYear} to ${lastYear}, with the strongest increases after 2022.`,
+        'Would you like me to render this as a line chart in chat?'
+      );
     }
 
     if (lowered.includes('casual') || lowered.includes('human')) {
-      return `Estimated annual casualties increase by ${casualtyDelta.toLocaleString()} between ${firstYear} and ${lastYear}, with sharper increases in the post-2021 period.`;
+      return withFollowUp(
+        `Estimated annual casualties increase by ${casualtyDelta.toLocaleString()} between ${firstYear} and ${lastYear}, with sharper increases in the post-2021 period.`,
+        'Would you like me to visualize casualty trend changes year by year?'
+      );
     }
 
     if (lowered.includes('spend') || lowered.includes('budget') || lowered.includes('military')) {
-      return `Military spending increases by $${spendDelta.toLocaleString()}B from ${firstYear} to ${lastYear}. Total spend in the dataset is $${dataset.summary.totalMilitarySpend.toLocaleString()}B.`;
+      return withFollowUp(
+        `Military spending increases by $${spendDelta.toLocaleString()}B from ${firstYear} to ${lastYear}. Total spend in the dataset is $${dataset.summary.totalMilitarySpend.toLocaleString()}B.`,
+        'Would you like me to compare this against CPI or casualties in a chart?'
+      );
     }
 
     if (lowered.includes('limit') || lowered.includes('bias') || lowered.includes('causal')) {
-      return 'Key limits: the dataset is correlational (not causal), casualties are estimated with methodological uncertainty, and the window is short (2018-2024) with U.S.-centered spending context.';
+      return withFollowUp(
+        'Key limits: the dataset is correlational (not causal), casualties are estimated with methodological uncertainty, and the window is short (2018-2024) with U.S.-centered spending context.',
+        'Would you like a compact text summary or a chart-led walkthrough of the trends?'
+      );
     }
 
-    return [
-      'I can answer this in offline mode using the site dataset.',
-      '',
-      `Quick snapshot: military spending +$${spendDelta.toLocaleString()}B, CPI +${cpiDelta.toFixed(1)}, casualties +${casualtyDelta.toLocaleString()} (${firstYear}-${lastYear}).`,
-      '',
-      'Try prompts like "summarize the site", "show CPI trend", "show casualty trend", "list tools", or "what are the data limits".',
-    ].join('\n');
+    return withFollowUp(
+      [
+        'I can answer this using the site dataset in local mode.',
+        `Quick snapshot: military spending +$${spendDelta.toLocaleString()}B, CPI +${cpiDelta.toFixed(1)}, casualties +${casualtyDelta.toLocaleString()} (${firstYear}-${lastYear}).`,
+      ].join('\n\n'),
+      'Would you like me to show CPI trend or casualty trend first?'
+    );
   };
 
-  const runFallback = (prompt: string): void => {
+  const runFallback = (prompt: string, replaceDraft = false): void => {
     setToolState('thinking');
-    appendMessage('assistant', offlineAssistantReply(prompt));
+    const reply = offlineAssistantReply(prompt);
+    if (replaceDraft) {
+      replaceAssistantDraft(reply);
+    } else {
+      appendMessage('assistant', reply);
+    }
     setToolState('idle');
+  };
+
+  const handleAgenticPrompt = async (prompt: string): Promise<boolean> => {
+    const lowered = prompt.toLowerCase();
+
+    if (/^(hi|hello|hey)\b/.test(lowered)) {
+      appendMessage('assistant', 'Hello! I\'m your War Impact Analyst. I can help you visualize the economic and human costs of conflict. Would you like to see a trend of the Cost of Living (CPI) or casualty data?');
+      return true;
+    }
+
+    const asksForCpi = /cpi|inflation|cost of living|price trend/.test(lowered);
+    const asksForCasualties = /casualt|human cost|human toll|deaths?/.test(lowered);
+
+    if (!asksForCpi && !asksForCasualties) {
+      return false;
+    }
+
+    const isCpi = asksForCpi && !asksForCasualties;
+    const toolName = isCpi ? 'get_cpi_data' : 'get_casualty_stats';
+
+    setToolState('thinking');
+    appendMessage('tool', `Calling ${toolName}() ...`);
+
+    try {
+      setToolState('tool-running');
+      const payload = isCpi ? await get_cpi_data() : await get_casualty_stats();
+      const summary = isCpi
+        ? `CPI increased by ${payload.risePct.toFixed(1)}% across ${payload.years[0]}-${payload.years[payload.years.length - 1]}, with the strongest rise in the post-2021 period.`
+        : `Casualties increased by ${payload.risePct.toFixed(1)}% across ${payload.years[0]}-${payload.years[payload.years.length - 1]}, indicating a substantial rise in human cost.`;
+      const followUp = isCpi
+        ? 'Would you like me to compare CPI against casualties next?'
+        : 'Would you like me to overlay CPI trend after this casualty view?';
+
+      appendMessage('assistant', withFollowUp(summary, followUp));
+      render_chart(payload, isCpi ? 'Cost of Living (CPI)' : 'Conflict Casualties', 'line');
+      setToolState('idle');
+      return true;
+    } catch {
+      const fallbackPayload = isCpi ? await get_cpi_data() : await get_casualty_stats();
+      appendMessage(
+        'assistant',
+        withFollowUp(
+          `I'm having trouble fetching the live chart right now, but according to my records, the ${isCpi ? 'CPI' : 'casualty trend'} rose by ${fallbackPayload.risePct.toFixed(1)}%. Would you like the text summary instead?`,
+          'Would you like a year-by-year text summary while chart rendering recovers?'
+        )
+      );
+      setToolState('error');
+      return true;
+    }
   };
 
   const runRequest = async (prompt: string, approved: boolean): Promise<void> => {
     lastPrompt = prompt;
     assistantBuffer = '';
-    appendMessage('user', prompt);
     appendMessage('assistant', '');
     setToolState('thinking');
     approvalBox.hidden = true;
@@ -472,7 +693,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
       });
 
       if (!response.ok || !response.body) {
-        runFallback(prompt);
+        runFallback(prompt, true);
         return;
       }
 
@@ -524,7 +745,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
         }
       }
     } catch {
-      runFallback(prompt);
+      runFallback(prompt, true);
     }
   };
 
@@ -533,6 +754,9 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     const prompt = input.value.trim();
     if (!prompt) return;
     input.value = '';
+    appendMessage('user', prompt);
+    const handledLocally = await handleAgenticPrompt(prompt);
+    if (handledLocally) return;
     await runRequest(prompt, false);
   });
 

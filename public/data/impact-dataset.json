@@ -1,0 +1,44 @@
+[
+  {
+    "year": 2018,
+    "cpiIndex": 251.1,
+    "educationGap": 45,
+    "casualties": 120000
+  },
+  {
+    "year": 2019,
+    "cpiIndex": 255.7,
+    "educationGap": 48,
+    "casualties": 135000
+  },
+  {
+    "year": 2020,
+    "cpiIndex": 258.8,
+    "educationGap": 55,
+    "casualties": 150000
+  },
+  {
+    "year": 2021,
+    "cpiIndex": 270.9,
+    "educationGap": 62,
+    "casualties": 185000
+  },
+  {
+    "year": 2022,
+    "cpiIndex": 292.5,
+    "educationGap": 75,
+    "casualties": 210000
+  },
+  {
+    "year": 2023,
+    "cpiIndex": 304.1,
+    "educationGap": 82,
+    "casualties": 245000
+  },
+  {
+    "year": 2024,
+    "cpiIndex": 315.4,
+    "educationGap": 90,
+    "casualties": 280000
+  }
+]
