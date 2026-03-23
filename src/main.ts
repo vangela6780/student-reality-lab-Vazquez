@@ -49,6 +49,11 @@ type EducationToolPayload = {
   avgLiteracy: number;
 };
 
+type LiveWarUpdatePayload = {
+  highlights: string[];
+  sources: string[];
+};
+
 // Load and display interactive visualization
 loadProcessedData()
   .then((dataset: ProcessedDataset) => {
@@ -501,6 +506,59 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     return data;
   };
 
+  const get_live_war_update = async (query: string): Promise<LiveWarUpdatePayload> => {
+    const openSearchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&limit=3&namespace=0&format=json&search=${encodeURIComponent(query)}`;
+    const searchResponse = await fetch(openSearchUrl, {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!searchResponse.ok) {
+      throw new Error(`Live research search failed (${searchResponse.status})`);
+    }
+
+    const searchJson = (await searchResponse.json()) as [string, string[], string[], string[]];
+    const titles = searchJson[1] ?? [];
+    const sources = (searchJson[3] ?? []).slice(0, 3);
+
+    if (titles.length === 0) {
+      return {
+        highlights: ['No recent public references were found for that war query.'],
+        sources: [],
+      };
+    }
+
+    const highlights: string[] = [];
+    for (let i = 0; i < Math.min(3, titles.length); i += 1) {
+      const title = titles[i];
+      const encodedTitle = encodeURIComponent(title.replace(/\s+/g, '_'));
+      const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedTitle}`;
+
+      try {
+        const summaryResponse = await fetch(summaryUrl, {
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!summaryResponse.ok) continue;
+
+        const summaryJson = (await summaryResponse.json()) as { extract?: string };
+        const extract = (summaryJson.extract ?? '').trim();
+        if (!extract) continue;
+        highlights.push(`${title}: ${extract}`);
+      } catch {
+        continue;
+      }
+    }
+
+    return {
+      highlights: highlights.length > 0 ? highlights : ['Public references were found, but summaries were unavailable.'],
+      sources,
+    };
+  };
+
   const get_cpi_data = async (): Promise<ToolPayload> => {
     try {
       const rows = await loadImpactDataset();
@@ -790,6 +848,42 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     const asksForCpi = /cpi|inflation|cost of living|price trend/.test(lowered);
     const asksForCasualties = /casualt|human cost|human toll|deaths?/.test(lowered);
     const asksForEducation = /education|school|closures?|literacy|affected regions?|region/.test(lowered);
+    const asksForWarTopic = /\bwar|conflict|invasion|ceasefire|frontline|battle|sudan\b/.test(lowered);
+    const asksForLatest = /\blatest|current|today|now|update\b/.test(lowered);
+
+    if (asksForWarTopic && asksForLatest && !asksForCpi && !asksForCasualties && !asksForEducation) {
+      setToolState('thinking');
+      appendMessage('tool', 'Calling get_live_war_update() ...');
+
+      try {
+        setToolState('tool-running');
+        const payload = await get_live_war_update(prompt);
+        const referenceText = payload.highlights.map((line) => `- ${line}`).join('\n');
+        const sourceText = payload.sources.length > 0
+          ? `\n\nSources:\n${payload.sources.map((url) => `- ${url}`).join('\n')}`
+          : '';
+
+        appendMessage(
+          'assistant',
+          withFollowUp(
+            `Here are the latest public references I found related to your war question:\n\n${referenceText}${sourceText}`,
+            'Would you like a short timeline summary or key humanitarian impacts next?'
+          )
+        );
+        setToolState('idle');
+        return true;
+      } catch {
+        appendMessage(
+          'assistant',
+          withFollowUp(
+            'I could not fetch live web references right now. I can still provide trends from your local war-impact dataset while live lookup recovers.',
+            'Would you like CPI, casualty, or education trends instead?'
+          )
+        );
+        setToolState('error');
+        return true;
+      }
+    }
 
     if (!asksForCpi && !asksForCasualties && !asksForEducation) {
       return false;
