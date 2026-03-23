@@ -1,0 +1,27 @@
+[
+  {
+    "region": "Eastern Europe",
+    "schoolClosures": 2400,
+    "literacyRate": 91.8
+  },
+  {
+    "region": "Middle East",
+    "schoolClosures": 3800,
+    "literacyRate": 84.6
+  },
+  {
+    "region": "North Africa",
+    "schoolClosures": 1700,
+    "literacyRate": 79.4
+  },
+  {
+    "region": "Sub-Saharan Africa",
+    "schoolClosures": 4600,
+    "literacyRate": 68.9
+  },
+  {
+    "region": "South Asia",
+    "schoolClosures": 3100,
+    "literacyRate": 76.1
+  }
+]

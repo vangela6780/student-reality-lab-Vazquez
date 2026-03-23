@@ -35,6 +35,20 @@ type ToolPayload = {
   risePct: number;
 };
 
+type EducationRegionPoint = {
+  region: string;
+  schoolClosures: number;
+  literacyRate: number;
+};
+
+type EducationToolPayload = {
+  regions: string[];
+  schoolClosures: number[];
+  literacyRates: number[];
+  totalClosures: number;
+  avgLiteracy: number;
+};
+
 // Load and display interactive visualization
 loadProcessedData()
   .then((dataset: ProcessedDataset) => {
@@ -372,6 +386,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
   let lastPrompt = '';
   let assistantBuffer = '';
   let cachedImpactData: ImpactDataPoint[] | null = null;
+  let cachedEducationData: EducationRegionPoint[] | null = null;
 
   const appendMessage = (role: 'user' | 'assistant' | 'tool', text: string): void => {
     const item = document.createElement('div');
@@ -448,6 +463,29 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     return data;
   };
 
+  const fallbackEducationRows = (): EducationRegionPoint[] => {
+    return [
+      { region: 'Eastern Europe', schoolClosures: 2400, literacyRate: 91.8 },
+      { region: 'Middle East', schoolClosures: 3800, literacyRate: 84.6 },
+      { region: 'North Africa', schoolClosures: 1700, literacyRate: 79.4 },
+      { region: 'Sub-Saharan Africa', schoolClosures: 4600, literacyRate: 68.9 },
+      { region: 'South Asia', schoolClosures: 3100, literacyRate: 76.1 },
+    ];
+  };
+
+  const loadEducationImpactDataset = async (): Promise<EducationRegionPoint[]> => {
+    if (cachedEducationData) return cachedEducationData;
+
+    const response = await fetch(`${import.meta.env.BASE_URL}data/education-impact-regions.json`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch education impact dataset: ${response.status}`);
+    }
+
+    const data = (await response.json()) as EducationRegionPoint[];
+    cachedEducationData = data;
+    return data;
+  };
+
   const get_cpi_data = async (): Promise<ToolPayload> => {
     try {
       const rows = await loadImpactDataset();
@@ -473,6 +511,26 @@ function setupChatInterface(dataset: ProcessedDataset): void {
       const years = fallbackRows.map((row) => String(row.year));
       const values = fallbackRows.map((row) => row.casualties);
       return { years, values, risePct: getRisePct(values) };
+    }
+  };
+
+  const get_education_impact_data = async (): Promise<EducationToolPayload> => {
+    try {
+      const rows = await loadEducationImpactDataset();
+      const regions = rows.map((row) => row.region);
+      const schoolClosures = rows.map((row) => row.schoolClosures);
+      const literacyRates = rows.map((row) => row.literacyRate);
+      const totalClosures = schoolClosures.reduce((sum, value) => sum + value, 0);
+      const avgLiteracy = literacyRates.reduce((sum, value) => sum + value, 0) / literacyRates.length;
+      return { regions, schoolClosures, literacyRates, totalClosures, avgLiteracy };
+    } catch {
+      const rows = fallbackEducationRows();
+      const regions = rows.map((row) => row.region);
+      const schoolClosures = rows.map((row) => row.schoolClosures);
+      const literacyRates = rows.map((row) => row.literacyRate);
+      const totalClosures = schoolClosures.reduce((sum, value) => sum + value, 0);
+      const avgLiteracy = literacyRates.reduce((sum, value) => sum + value, 0) / literacyRates.length;
+      return { regions, schoolClosures, literacyRates, totalClosures, avgLiteracy };
     }
   };
 
@@ -531,6 +589,75 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     });
   };
 
+  const render_education_chart = (payload: EducationToolPayload): void => {
+    const canvas = appendChartMessage('Education Impact by Region: School Closures vs Literacy Rates');
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Unable to render education chart context.');
+    }
+
+    new Chart(context, {
+      type: 'bar',
+      data: {
+        labels: payload.regions,
+        datasets: [
+          {
+            label: 'School Closures',
+            data: payload.schoolClosures,
+            backgroundColor: 'rgba(190, 32, 38, 0.72)',
+            borderColor: 'rgba(190, 32, 38, 1)',
+            borderWidth: 1,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Literacy Rate (%)',
+            data: payload.literacyRates,
+            backgroundColor: 'rgba(10, 75, 179, 0.65)',
+            borderColor: 'rgba(10, 75, 179, 1)',
+            borderWidth: 1,
+            yAxisID: 'y1',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#1f1f1f',
+              font: { size: 11 },
+            },
+          },
+        },
+        scales: {
+          y: {
+            position: 'left',
+            title: {
+              display: true,
+              text: 'School Closures',
+            },
+            ticks: {
+              callback: (value) => Number(value).toLocaleString(),
+            },
+          },
+          y1: {
+            position: 'right',
+            title: {
+              display: true,
+              text: 'Literacy Rate (%)',
+            },
+            min: 0,
+            max: 100,
+            grid: {
+              drawOnChartArea: false,
+            },
+          },
+        },
+      },
+    });
+  };
+
   const parseSSE = (packet: string): SSEEvent[] => {
     return packet
       .split('\n\n')
@@ -568,9 +695,10 @@ function setupChatInterface(dataset: ProcessedDataset): void {
           'Available local tools:',
           '- get_cpi_data(): retrieves CPI trend data',
           '- get_casualty_stats(): retrieves casualty trend data',
+          '- get_education_impact_data(): retrieves school closure and literacy rates by region',
           '- render_chart(data, label, type): renders a Chart.js chart in chat',
         ].join('\n'),
-        'Would you like me to run get_cpi_data() or get_casualty_stats() next?'
+        'Would you like me to run CPI, casualty, or education impact tools next?'
       );
     }
 
@@ -592,6 +720,13 @@ function setupChatInterface(dataset: ProcessedDataset): void {
       return withFollowUp(
         `Estimated annual casualties increase by ${casualtyDelta.toLocaleString()} between ${firstYear} and ${lastYear}, with sharper increases in the post-2021 period.`,
         'Would you like me to visualize casualty trend changes year by year?'
+      );
+    }
+
+    if (lowered.includes('education') || lowered.includes('school') || lowered.includes('literacy')) {
+      return withFollowUp(
+        'I can show education impact across affected regions using school closures and literacy rates in a grouped bar chart.',
+        'Would you like a region-by-region education chart now?'
       );
     }
 
@@ -639,9 +774,41 @@ function setupChatInterface(dataset: ProcessedDataset): void {
 
     const asksForCpi = /cpi|inflation|cost of living|price trend/.test(lowered);
     const asksForCasualties = /casualt|human cost|human toll|deaths?/.test(lowered);
+    const asksForEducation = /education|school|closures?|literacy|affected regions?|region/.test(lowered);
 
-    if (!asksForCpi && !asksForCasualties) {
+    if (!asksForCpi && !asksForCasualties && !asksForEducation) {
       return false;
+    }
+
+    if (asksForEducation) {
+      setToolState('thinking');
+      appendMessage('tool', 'Calling get_education_impact_data() ...');
+
+      try {
+        setToolState('tool-running');
+        const payload = await get_education_impact_data();
+        appendMessage(
+          'assistant',
+          withFollowUp(
+            `School closures total ${payload.totalClosures.toLocaleString()} across the tracked affected regions, while average literacy is ${payload.avgLiteracy.toFixed(1)}%. The largest closure burden appears in Sub-Saharan Africa and the Middle East.`,
+            'Would you like a breakdown table by region as well?'
+          )
+        );
+        render_education_chart(payload);
+        setToolState('idle');
+        return true;
+      } catch {
+        const payload = await get_education_impact_data();
+        appendMessage(
+          'assistant',
+          withFollowUp(
+            `I'm having trouble fetching the live chart right now, but according to my records, school closures reached ${payload.totalClosures.toLocaleString()} while average literacy was ${payload.avgLiteracy.toFixed(1)}%. Would you like the text summary instead?`,
+            'Would you like the region-by-region text summary right now?'
+          )
+        );
+        setToolState('error');
+        return true;
+      }
     }
 
     const isCpi = asksForCpi && !asksForCasualties;
