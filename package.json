@@ -5,8 +5,8 @@
   "description": "Phase 2: Data pipeline + web app with integrated AI CLI toolset",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:api": "npm --prefix ai-orchestration-nextjs run dev",
+    "dev": "vite --port 5173 --strictPort",
+    "dev:api": "npm --prefix ai-orchestration-nextjs run dev -- --port 3000",
     "dev:all": "concurrently \"npm:dev\" \"npm:dev:api\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
