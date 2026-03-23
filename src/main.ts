@@ -511,6 +511,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     const searchResponse = await fetch(openSearchUrl, {
       headers: {
         Accept: 'application/json',
+        'User-Agent': 'student-reality-lab-war-impact/1.0',
       },
     });
 
@@ -539,6 +540,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
         const summaryResponse = await fetch(summaryUrl, {
           headers: {
             Accept: 'application/json',
+            'User-Agent': 'student-reality-lab-war-impact/1.0',
           },
         });
 
