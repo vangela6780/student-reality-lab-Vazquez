@@ -113,7 +113,6 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
           <h2>AI Assistant: MCP-Style Orchestration</h2>
           <p>
             Ask for summaries or tool-oriented prompts like "list tools" or "use filesystem tool".
-            If no API backend is available, a local fallback responder is used so the interface still works.
           </p>
         </div>
 
