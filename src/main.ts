@@ -133,6 +133,21 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
           <input id="ai-chat-input" class="ai-chat-input" type="text" placeholder="Send a prompt..." required />
           <button class="btn" type="submit">Send</button>
         </form>
+
+        <div class="ai-quick-actions" aria-label="Suggested prompts">
+          <span class="ai-quick-label">Suggested Prompts</span>
+          <div class="ai-quick-row">
+            <button class="quick-action-btn" type="button" data-prompt="Show a CPI chart compared to military spending and explain the trend.">
+              📈 Show CPI Chart
+            </button>
+            <button class="quick-action-btn" type="button" data-prompt="List the impact of war on education and show a bar chart of school closures versus literacy rates in affected regions.">
+              🎓 Education Impact
+            </button>
+            <button class="quick-action-btn" type="button" data-prompt="Show casualty trends over time and explain the human impact.">
+              👥 Casualty Trends
+            </button>
+          </div>
+        </div>
       </section>
     </section>
 
@@ -377,6 +392,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
   const approvalBox = document.getElementById('approval-box') as HTMLDivElement | null;
   const approvalText = document.getElementById('approval-text') as HTMLParagraphElement | null;
   const approveBtn = document.getElementById('approve-btn') as HTMLButtonElement | null;
+  const quickActions = Array.from(document.querySelectorAll<HTMLButtonElement>('.quick-action-btn'));
 
   if (!form || !input || !log || !badge || !approvalBox || !approvalText || !approveBtn) return;
 
@@ -821,7 +837,7 @@ function setupChatInterface(dataset: ProcessedDataset): void {
       setToolState('tool-running');
       const payload = isCpi ? await get_cpi_data() : await get_casualty_stats();
       const summary = isCpi
-        ? `CPI increased by ${payload.risePct.toFixed(1)}% across ${payload.years[0]}-${payload.years[payload.years.length - 1]}, with the strongest rise in the post-2021 period.`
+        ? `I've analyzed the data. Here is the trend for the Cost of Living (CPI) compared to military spending. As you can see, CPI increased by ${payload.risePct.toFixed(1)}% across ${payload.years[0]}-${payload.years[payload.years.length - 1]}, with the sharpest rise in the post-2021 period.`
         : `Casualties increased by ${payload.risePct.toFixed(1)}% across ${payload.years[0]}-${payload.years[payload.years.length - 1]}, indicating a substantial rise in human cost.`;
       const followUp = isCpi
         ? 'Would you like me to compare CPI against casualties next?'
@@ -916,15 +932,27 @@ function setupChatInterface(dataset: ProcessedDataset): void {
     }
   };
 
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const prompt = input.value.trim();
+  const dispatchPrompt = async (rawPrompt: string): Promise<void> => {
+    const prompt = rawPrompt.trim();
     if (!prompt) return;
-    input.value = '';
     appendMessage('user', prompt);
     const handledLocally = await handleAgenticPrompt(prompt);
     if (handledLocally) return;
     await runRequest(prompt, false);
+  };
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const prompt = input.value;
+    input.value = '';
+    await dispatchPrompt(prompt);
+  });
+
+  quickActions.forEach((button) => {
+    button.addEventListener('click', async () => {
+      const prompt = button.dataset.prompt ?? button.textContent ?? '';
+      await dispatchPrompt(prompt);
+    });
   });
 
   approveBtn.addEventListener('click', async () => {
