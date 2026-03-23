@@ -32,8 +32,71 @@ function pickToolIntent(message: string): boolean {
   return lowered.includes('tool') || lowered.includes('list files') || lowered.includes('filesystem');
 }
 
-async function* fallbackText(message: string): AsyncGenerator<string> {
-  const content = `Fallback response (no model key): You said \"${message}\". MCP tool integration is active, and you can ask me to list available tools.`;
+function pickWebResearchIntent(message: string): boolean {
+  const lowered = message.toLowerCase();
+  return /\bwar|conflict|invasion|ceasefire|frontline|battle|latest|current|today|news\b/.test(lowered);
+}
+
+type WikiOpenSearchResponse = [string, string[], string[], string[]];
+
+async function fetchWarWebContext(query: string): Promise<string> {
+  const searchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&limit=3&namespace=0&format=json&search=${encodeURIComponent(query)}`;
+  const response = await fetch(searchUrl, {
+    headers: {
+      Accept: 'application/json',
+      'User-Agent': 'student-reality-lab-war-impact/1.0',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Web research search failed (${response.status})`);
+  }
+
+  const payload = (await response.json()) as WikiOpenSearchResponse;
+  const titles = payload[1] ?? [];
+  const links = payload[3] ?? [];
+
+  if (titles.length === 0) {
+    return 'No relevant public web references were found for this query.';
+  }
+
+  const snippets: string[] = [];
+  for (let index = 0; index < Math.min(3, titles.length); index += 1) {
+    const rawTitle = titles[index];
+    const encodedTitle = encodeURIComponent(rawTitle.replace(/\s+/g, '_'));
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedTitle}`;
+
+    try {
+      const summaryResponse = await fetch(summaryUrl, {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'student-reality-lab-war-impact/1.0',
+        },
+      });
+
+      if (!summaryResponse.ok) continue;
+
+      const summaryJson = (await summaryResponse.json()) as { extract?: string };
+      const extract = (summaryJson.extract ?? '').trim();
+      if (!extract) continue;
+
+      snippets.push(`- ${rawTitle}: ${extract} Source: ${links[index] ?? `https://en.wikipedia.org/wiki/${encodedTitle}`}`);
+    } catch {
+      continue;
+    }
+  }
+
+  if (snippets.length === 0) {
+    return 'Web references were found but detailed summaries were unavailable.';
+  }
+
+  return snippets.join('\n');
+}
+
+async function* fallbackText(message: string, webSummary?: string): AsyncGenerator<string> {
+  const content = webSummary
+    ? `Fallback response (no model key): I could not use the hosted model, but I found public web references for \"${message}\".\n${webSummary}\nWould you like a concise text summary or a regional breakdown?`
+    : `Fallback response (no model key): You said \"${message}\". MCP tool integration is active, and you can ask me to list available tools.`;
   for (const part of content.split(' ')) {
     await new Promise((resolve) => setTimeout(resolve, 4));
     yield `${part} `;
@@ -61,6 +124,7 @@ export function createChatPostHandler(deps: ChatHandlerDeps) {
           write('tools', { count: tools.length, tools: tools.map((t) => ({ name: t.name, serverId: t.serverId })) });
 
           let toolSummary = '';
+          let webSummary = '';
           if (pickToolIntent(message) && tools.length > 0) {
             const targetTool = tools[0];
             if (targetTool.requiresConfirmation && !body.pendingApproval?.approved) {
@@ -87,9 +151,37 @@ export function createChatPostHandler(deps: ChatHandlerDeps) {
             write('status', { state: 'thinking' as ToolState });
           }
 
+          if (pickWebResearchIntent(message)) {
+            write('status', { state: 'tool-running' as ToolState });
+            write('tool_call', { toolName: 'web_war_research', serverId: 'builtin-web' });
+
+            try {
+              webSummary = await fetchWarWebContext(message);
+              write('tool_result', {
+                toolName: 'web_war_research',
+                content: webSummary,
+              });
+            } catch (error) {
+              webSummary = `Web research failed: ${String(error)}`;
+              write('tool_result', {
+                toolName: 'web_war_research',
+                content: webSummary,
+              });
+            }
+
+            write('status', { state: 'thinking' as ToolState });
+          }
+
           if (deps.hasModelKey()) {
-            const prompt = toolSummary
-              ? `User: ${message}\n\nTool Output:\n${toolSummary}\n\nRespond using the tool output when useful.`
+            const contextBlocks = [
+              toolSummary ? `MCP Tool Output:\n${toolSummary}` : '',
+              webSummary ? `Web Research Output:\n${webSummary}` : '',
+            ]
+              .filter(Boolean)
+              .join('\n\n');
+
+            const prompt = contextBlocks
+              ? `User: ${message}\n\n${contextBlocks}\n\nRespond using the available tool context, cite web claims as public reference summaries when relevant, and mention uncertainty for rapidly changing events.`
               : message;
             let deltaCount = 0;
             for await (const delta of deps.streamModelText(prompt)) {
@@ -102,7 +194,7 @@ export function createChatPostHandler(deps: ChatHandlerDeps) {
               });
             }
           } else {
-            for await (const delta of fallbackText(message)) {
+            for await (const delta of fallbackText(message, webSummary)) {
               write('text_delta', { text: delta });
             }
           }
