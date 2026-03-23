@@ -524,7 +524,7 @@ h2 {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.74);
   min-height: 135px;
-  max-height: 220px;
+  max-height: min(52vh, 420px);
   overflow-y: auto;
   padding: 0.55rem;
   margin-bottom: 0.65rem;
@@ -576,7 +576,7 @@ h2 {
 .chat-chart-wrap {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 180px;
   margin-top: 0.45rem;
   border: 1px solid rgba(17, 17, 17, 0.2);
   border-radius: 8px;
@@ -795,7 +795,7 @@ footer {
   }
 
   .chat-chart-wrap {
-    height: 190px;
+    height: 150px;
   }
 }
 
