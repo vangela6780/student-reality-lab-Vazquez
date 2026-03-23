@@ -507,20 +507,56 @@ function setupChatInterface(dataset: ProcessedDataset): void {
   };
 
   const get_live_war_update = async (query: string): Promise<LiveWarUpdatePayload> => {
-    const openSearchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&limit=3&namespace=0&format=json&search=${encodeURIComponent(query)}`;
-    const searchResponse = await fetch(openSearchUrl, {
-      headers: {
-        Accept: 'application/json',
-      },
-    });
+    const buildCandidateQueries = (rawQuery: string): string[] => {
+      const cleaned = rawQuery.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+      const stopWords = new Set([
+        'what', 'whats', 'is', 'the', 'latest', 'current', 'today', 'now', 'update', 'updates',
+        'in', 'on', 'for', 'about', 'tell', 'me', 'war', 'conflict', 'news', 'status'
+      ]);
 
-    if (!searchResponse.ok) {
-      throw new Error(`Live research search failed (${searchResponse.status})`);
+      const tokens = cleaned
+        .split(/\s+/)
+        .map((token) => token.trim())
+        .filter((token) => token.length > 2 && !stopWords.has(token));
+
+      const uniqueTokens = Array.from(new Set(tokens));
+      const distilled = uniqueTokens.slice(0, 4).join(' ').trim();
+
+      const candidates = [
+        rawQuery.trim(),
+        distilled ? `${distilled} war` : '',
+        distilled ? `${distilled} conflict` : '',
+      ].filter((value): value is string => value.length > 0);
+
+      return Array.from(new Set(candidates));
+    };
+
+    let titles: string[] = [];
+    let sources: string[] = [];
+    const candidates = buildCandidateQueries(query);
+
+    for (const candidate of candidates) {
+      const openSearchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&limit=3&namespace=0&format=json&search=${encodeURIComponent(candidate)}`;
+      const searchResponse = await fetch(openSearchUrl, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!searchResponse.ok) {
+        continue;
+      }
+
+      const searchJson = (await searchResponse.json()) as [string, string[], string[], string[]];
+      const nextTitles = searchJson[1] ?? [];
+      const nextSources = (searchJson[3] ?? []).slice(0, 3);
+
+      if (nextTitles.length > 0) {
+        titles = nextTitles;
+        sources = nextSources;
+        break;
+      }
     }
-
-    const searchJson = (await searchResponse.json()) as [string, string[], string[], string[]];
-    const titles = searchJson[1] ?? [];
-    const sources = (searchJson[3] ?? []).slice(0, 3);
 
     if (titles.length === 0) {
       return {
