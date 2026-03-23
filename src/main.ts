@@ -94,7 +94,7 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
   
   app.innerHTML = `
     <header>
-      <h1>The Price of War: Military Spending vs. Human Suffering</h1>
+      <h1>The Cost of Conflict: Budgets and Human Consequences</h1>
       <p class="subtitle">Interactive Data Story (2018–2024)</p>
     </header>
 
