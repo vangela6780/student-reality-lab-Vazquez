@@ -276,8 +276,9 @@ Acceptance Criteria:
         try {
           await streamAssistantResponse(message, assistantMessage);
         } catch (error) {
+          const detail = error instanceof Error ? error.message : String(error);
           assistantMessage.textContent =
-            'I could not reach the AI service. Make sure the API server is running and OPENAI_API_KEY is set in ai-orchestration-nextjs/.env.local.';
+            `I could not reach the AI service. ${detail}. Ensure the API server is running and OPENAI_API_KEY is set in ai-orchestration-nextjs/.env.local.`;
         } finally {
           setChatBusy(false);
         }
