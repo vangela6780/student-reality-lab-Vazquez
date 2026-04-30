@@ -389,7 +389,8 @@ h2 {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;30, 41, 59, 0.5);
+  min-width: 700px;
+  background: rgba(30, 41, 59, 0.5);
 }
 
 .data-table th,
@@ -412,8 +413,7 @@ h2 {
 }
 
 .data-table tbody tr:hover {
-  background: rgba(59, 130, 246, 0.15
-  background: rgba(10, 75, 179, 0.14);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .card {
