@@ -6,3 +6,5 @@ build/
 Thumbs.db
 ai-orchestration-nextjs/.next/
 ai-orchestration-nextjs/.env.local
+
+*.tsbuildinfo
