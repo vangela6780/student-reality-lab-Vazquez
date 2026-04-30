@@ -5,15 +5,15 @@
  */
 
 :root {
-  --paper: #f7f4ed;
-  --ink: #16202a;
-  --muted-ink: #4b5a66;
-  --blue: #1459b8;
-  --red: #b8322f;
-  --yellow: #e2a90a;
-  --line: #1f2b36;
-  --panel: rgba(255, 255, 255, 0.84);
-  --shadow: rgba(18, 29, 40, 0.14);
+  --paper: #0f172a;
+  --ink: #f1f5f9;
+  --muted-ink: #cbd5e1;
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --yellow: #fbbf24;
+  --line: #334155;
+  --panel: rgba(30, 41, 59, 0.6);
+  --shadow: rgba(0, 0, 0, 0.3);
 
   font-family: 'IBM Plex Sans', 'Trebuchet MS', sans-serif;
   line-height: 1.62;
@@ -35,9 +35,9 @@
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 10% 12%, rgba(20, 89, 184, 0.14) 0 12%, transparent 13%),
-    radial-gradient(circle at 86% 18%, rgba(184, 50, 47, 0.12) 0 8%, transparent 9%),
-    linear-gradient(142deg, #f8f6f0 0%, #efe9de 48%, #f9f7f2 100%);
+    radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.1) 0 12%, transparent 30%),
+    radial-gradient(circle at 86% 18%, rgba(239, 68, 68, 0.08) 0 8%, transparent 25%),
+    linear-gradient(142deg, #0f172a 0%, #1a1f3a 48%, #1e293b 100%);
   color: var(--ink);
 }
 
@@ -86,11 +86,12 @@ header {
   text-align: left;
   margin-bottom: 1.25rem;
   padding: 1.4rem 1.4rem 1.5rem;
-  border: 1px solid rgba(31, 43, 54, 0.28);
-  background: linear-gradient(120deg, rgba(20, 89, 184, 0.1) 0%, rgba(255, 255, 255, 0.9) 36%, rgba(226, 169, 10, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 41, 59, 0.5) 50%, rgba(239, 68, 68, 0.1) 100%);
   box-shadow: 0 14px 30px var(--shadow);
   position: relative;
   border-radius: 18px;
+  backdrop-filter: blur(8px);
 }
 
 .hero-block {
@@ -103,7 +104,7 @@ header {
 
 .hero-lead {
   max-width: 60ch;
-  color: #252525;
+  color: var(--ink);
   font-size: 1.02rem;
 }
 
@@ -119,22 +120,24 @@ header {
   letter-spacing: 0.02em;
   text-decoration: none;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 0.62rem 1.05rem;
   color: #f8f8f8;
-  background: linear-gradient(180deg, var(--blue), #083680);
-  box-shadow: 0 6px 14px rgba(20, 89, 184, 0.24);
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
 }
 
 .hero-btn:hover,
 .hero-btn:focus-visible {
   transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
 }
 
 .hero-btn-secondary {
-  background: linear-gradient(180deg, #ffffff, #f0f3f7);
-  color: var(--ink);
-  border-color: rgba(31, 43, 54, 0.22);
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--blue);
+  border-color: rgba(59, 130, 246, 0.3);
   box-shadow: none;
 }
 
@@ -175,7 +178,7 @@ h2 {
 
 .subtitle {
   font-size: 1.03rem;
-  color: #344656;
+  color: #cbd5e1;
   max-width: 68ch;
 }
 
@@ -188,11 +191,11 @@ h2 {
   gap: 0.5rem;
   margin-bottom: 1.2rem;
   padding: 0.55rem;
-  border: 1px solid rgba(31, 43, 54, 0.28);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(250, 248, 243, 0.92);
+  background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(6px);
-  box-shadow: 0 8px 22px rgba(21, 38, 55, 0.1);
+  box-shadow: 0 8px 22px var(--shadow);
 }
 
 .story-link {
@@ -200,7 +203,7 @@ h2 {
   font-size: 1rem;
   letter-spacing: 0.02em;
   text-decoration: none;
-  color: #21303f;
+  color: var(--ink);
   border: 2px solid transparent;
   border-radius: 999px;
   padding: 0.45rem 0.8rem;
@@ -209,7 +212,7 @@ h2 {
 
 .story-link:hover {
   transform: translateY(-1px);
-  background: rgba(20, 89, 184, 0.14);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .story-link:focus-visible {
@@ -224,13 +227,13 @@ h2 {
 
 .story-section,
 .chart-section {
-  background: var(--panel);
-  border: 1px solid rgba(31, 43, 54, 0.24);
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: clamp(1.2rem, 2vw, 2rem);
   margin-bottom: 1.35rem;
   box-shadow: 0 12px 30px var(--shadow);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
 }
 
 .story-section {
@@ -251,17 +254,17 @@ h2 {
 
 .story-text p {
   margin-bottom: 0.95rem;
-  color: #1f1f1f;
+  color: #cbd5e1;
   font-size: clamp(1rem, 1.1vw, 1.08rem);
 }
 
 .story-text strong {
-  color: #072f72;
+  color: var(--blue);
   font-weight: 600;
 }
 
 .insight {
-  background: linear-gradient(90deg, rgba(226, 169, 10, 0.22), rgba(255, 255, 255, 0));
+  background: rgba(239, 68, 68, 0.1);
   border-left: 3px solid var(--red);
   padding: 1rem;
   margin-top: 1.2rem;
@@ -290,9 +293,9 @@ h2 {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(17, 17, 17, 0.14);
-  background: linear-gradient(180deg, #0f4eb8, #093a8d);
-  border-color: #0f4eb8;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
+  border-color: var(--blue);
   color: #f8f8f8;
 }
 
@@ -302,10 +305,10 @@ h2 {
 }
 
 .btn-active {
-  background: linear-gradient(180deg, var(--blue), #083680);
+  background: linear-gradient(135deg, var(--blue), #1d4ed8);
   border-color: var(--blue);
   color: #f9f9f9;
-  box-shadow: 0 6px 14px rgba(10, 75, 179, 0.34);
+  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.4);
 }
 
 .chart-container {
@@ -313,53 +316,53 @@ h2 {
   height: min(58vh, 520px);
   min-height: 340px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.94)),
-    linear-gradient(90deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px);
+    linear-gradient(180deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.8)),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
   background-size: auto, 16px 16px, 16px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(31, 43, 54, 0.24);
+  border: 1px solid var(--line);
   padding: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .annotation-note {
-  background: rgba(226, 169, 10, 0.18);
+  background: rgba(239, 68, 68, 0.15);
   border-left: 3px solid var(--red);
   padding: 0.9rem 1rem;
   border-radius: 8px;
-  color: #1e1e1e;
+  color: #f1f5f9;
   font-size: 0.96rem;
 }
 
 .annotation-note strong {
-  color: #5d1215;
+  color: #fca5a5;
 }
 
 .chart-info {
   margin-bottom: 0.9rem;
-  border: 1px solid rgba(31, 43, 54, 0.26);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 12px;
   padding: 0.9rem 1rem;
-  background: linear-gradient(120deg, rgba(10, 75, 179, 0.08), rgba(245, 183, 0, 0.11));
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .chart-info h3 {
   font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
   font-size: 1.2rem;
   margin-bottom: 0.35rem;
-  color: #0d2f6b;
+  color: var(--blue);
 }
 
 .chart-info p {
   margin: 0;
-  color: #1f1f1f;
+  color: #cbd5e1;
 }
 
 .chart-info-detail {
   margin-top: 0.45rem;
   font-size: 0.95rem;
-  color: #303030;
+  color: #94a3b8;
 }
 
 .summary-cards {
@@ -370,12 +373,13 @@ h2 {
 }
 
 .data-table-section {
-  background: var(--panel);
-  border: 1px solid rgba(31, 43, 54, 0.24);
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: clamp(1.1rem, 2vw, 1.7rem);
   margin-bottom: 1.8rem;
   box-shadow: 0 10px 26px var(--shadow);
+  backdrop-filter: blur(4px);
 }
 
 .table-wrap {
@@ -385,51 +389,53 @@ h2 {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
-  background: rgba(255, 255, 255, 0.78);
+  min-width: 700px;30, 41, 59, 0.5);
 }
 
 .data-table th,
 .data-table td {
-  border: 1px solid rgba(17, 17, 17, 0.18);
+  border: 1px solid var(--line);
   padding: 0.62rem 0.7rem;
   text-align: left;
   font-size: 0.95rem;
 }
 
 .data-table th {
-  background: rgba(10, 75, 179, 0.92);
-  color: #f8f8f8;
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--ink);
   font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
   letter-spacing: 0.02em;
 }
 
 .data-table tbody tr:nth-child(even) {
-  background: rgba(245, 183, 0, 0.12);
+  background: rgba(59, 130, 246, 0.08);
 }
 
 .data-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.15
   background: rgba(10, 75, 179, 0.14);
 }
 
 .card {
-  border: 1px solid rgba(31, 43, 54, 0.24);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 1.2rem;
   position: relative;
   overflow: clip;
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .card:nth-child(1) {
-  background: linear-gradient(140deg, rgba(10, 75, 179, 0.12), rgba(255, 255, 255, 0.78));
+  background: linear-gradient(140deg, rgba(59, 130, 246, 0.15), rgba(30, 41, 59, 0.7));
 }
 
 .card:nth-child(2) {
-  background: linear-gradient(140deg, rgba(245, 183, 0, 0.24), rgba(255, 255, 255, 0.82));
+  background: linear-gradient(140deg, rgba(251, 191, 36, 0.2), rgba(30, 41, 59, 0.7));
 }
 
 .card:nth-child(3) {
-  background: linear-gradient(140deg, rgba(190, 32, 38, 0.15), rgba(255, 255, 255, 0.79));
+  background: linear-gradient(140deg, rgba(239, 68, 68, 0.15), rgba(30, 41, 59, 0.7));
 }
 
 .card::after {
@@ -445,7 +451,7 @@ h2 {
 
 .card h3 {
   font-size: 1rem;
-  color: #292929;
+  color: var(--ink);
   text-transform: uppercase;
   margin-bottom: 0.45rem;
 }
@@ -453,7 +459,7 @@ h2 {
 .card .stat {
   font-size: clamp(1.65rem, 2.6vw, 2.2rem);
   font-weight: 700;
-  color: #091f49;
+  color: var(--blue);
   margin-bottom: 0.2rem;
 }
 
@@ -463,8 +469,8 @@ h2 {
 }
 
 .student-callout {
-  background: linear-gradient(135deg, rgba(10, 75, 179, 0.14), rgba(245, 183, 0, 0.18));
-  border: 1px solid rgba(20, 89, 184, 0.42);
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 12px;
   padding: 1.4rem;
   margin: 1.4rem 0;
@@ -481,7 +487,7 @@ h2 {
 
 .student-callout h3 {
   font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
-  color: #043b8f;
+  color: var(--blue);
   font-size: 1.2rem;
   margin-bottom: 0.8rem;
   text-transform: uppercase;
@@ -490,7 +496,7 @@ h2 {
 
 .student-callout p {
   margin-bottom: 0.9rem;
-  color: #1f1f1f;
+  color: #cbd5e1;
   font-size: 1rem;
 }
 
@@ -545,34 +551,35 @@ h2 {
 }
 
 .tool-status-idle {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(30, 41, 59, 0.6);
 }
 
 .tool-status-thinking {
-  background: rgba(10, 75, 179, 0.14);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .tool-status-tool-running {
-  background: rgba(245, 183, 0, 0.38);
+  background: rgba(251, 191, 36, 0.15);
 }
 
 .tool-status-error {
-  background: rgba(190, 32, 38, 0.18);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .ai-chat-log {
-  border: 1px solid rgba(31, 43, 54, 0.28);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(30, 41, 59, 0.4);
   min-height: 135px;
   max-height: min(52vh, 420px);
   overflow-y: auto;
   padding: 0.55rem;
   margin-bottom: 0.65rem;
+  backdrop-filter: blur(4px);
 }
 
 .ai-msg {
-  border: 1px solid rgba(17, 17, 17, 0.2);
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 0.42rem 0.55rem;
   margin-bottom: 0.45rem;
@@ -587,31 +594,31 @@ h2 {
   font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
   font-size: 0.74rem;
   text-transform: uppercase;
-  color: #393939;
+  color: #94a3b8;
   margin-bottom: 0.1rem;
 }
 
 .ai-msg-user {
-  background: rgba(10, 75, 179, 0.12);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .ai-msg-assistant {
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(30, 41, 59, 0.6);
 }
 
 .ai-msg-tool {
-  background: rgba(245, 183, 0, 0.28);
+  background: rgba(251, 191, 36, 0.15);
 }
 
 .ai-msg p {
   margin: 0;
   font-size: 0.86rem;
-  color: #1e1e1e;
+  color: #cbd5e1;
   white-space: pre-wrap;
 }
 
 .ai-msg-chart {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(30, 41, 59, 0.7);
 }
 
 .chat-chart-wrap {
@@ -619,10 +626,10 @@ h2 {
   width: 100%;
   height: 180px;
   margin-top: 0.45rem;
-  border: 1px solid rgba(17, 17, 17, 0.2);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0.35rem;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(30, 41, 59, 0.5);
 }
 
 .chat-inline-chart {
