@@ -188,11 +188,13 @@ body {
 
 .hero-section {
   background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  display: flex;
   align-items: center;
-  min-height: 80vh;
+  min-height: 72vh;
+}
+
+.hero-content {
+  max-width: 760px;
 }
 
 .hero-content h1 {
@@ -223,99 +225,6 @@ body {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
-.hero-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.visual-block {
-  width: 100%;
-  background: linear-gradient(155deg, #ffffff 0%, #eef4ff 100%);
-  border: 1px solid #dbe7ff;
-  border-radius: 16px;
-  box-shadow: var(--shadow-md);
-  padding: 1.2rem;
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.visual-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.9rem;
-}
-
-.visual-panel-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.visual-panel-tag {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #0f3ea8;
-  background: #dbe7ff;
-  border-radius: 999px;
-  padding: 0.2rem 0.5rem;
-  font-weight: 700;
-}
-
-.visual-panel-items {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.visual-panel-item {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  gap: 0.6rem;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid #d7e4ff;
-  border-radius: 10px;
-  padding: 0.45rem 0.55rem;
-}
-
-.item-label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #3b4a6b;
-  font-weight: 700;
-}
-
-.item-value {
-  font-size: 0.86rem;
-  color: var(--text-secondary);
-}
-
-.visual-progress {
-  margin-top: 0.9rem;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.6rem;
-  align-items: center;
-  font-size: 0.86rem;
-  color: #3b4a6b;
-}
-
-.visual-progress-track {
-  height: 8px;
-  background: #deebff;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.visual-progress-fill {
-  width: 82%;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--primary-color), #4f46e5);
 }
 
 @keyframes pulse {
