@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Why Spec-Driven Development Works | DevLearn</title>
+    <meta name="description" content="A regular content page that still uses storytelling principles: pacing, context, evidence, and takeaway." />
+    <link rel="stylesheet" href="./src/style-light.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h2>DevLearn</h2>
+          <span class="tagline">Build Right From Start</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="./index.html#hero">Home Story</a></li>
+          <li><a href="./login.html" class="btn-login">Login</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="content-page-wrap">
+      <a id="back-link" class="back-pill" href="./index.html#hero">← Back To Story Slides</a>
+
+      <header class="content-page-hero">
+        <h1>Why Spec-Driven Development Works</h1>
+        <p>
+          This page applies scrollytelling ideas to a regular content layout: clear sequence, progressive context,
+          and section-level navigation without forcing a full-screen slide format.
+        </p>
+      </header>
+
+      <section class="content-story-grid">
+        <aside class="content-toc" aria-label="Page sections">
+          <h3>On This Page</h3>
+          <a href="#problem">1. The Real Problem</a>
+          <a href="#method">2. The Method</a>
+          <a href="#evidence">3. Evidence</a>
+          <a href="#workflow">4. Practical Workflow</a>
+          <a href="#takeaway">5. Takeaway</a>
+        </aside>
+
+        <div class="content-story">
+          <article id="problem">
+            <h2>The Real Problem</h2>
+            <p>
+              Most projects do not fail because teams cannot code. They fail because teams start coding before they agree on scope.
+              Features expand, assumptions clash, and timelines slip.
+            </p>
+            <p>
+              In storytelling terms, this is the conflict: strong effort, weak alignment.
+            </p>
+          </article>
+
+          <article id="method">
+            <h2>The Method</h2>
+            <p>
+              A specification turns vague intent into concrete instructions. A good spec usually includes:
+            </p>
+            <ul>
+              <li>Problem statement and user context.</li>
+              <li>Feature boundaries and non-goals.</li>
+              <li>User stories and acceptance criteria.</li>
+              <li>Constraints, edge cases, and definition of done.</li>
+            </ul>
+          </article>
+
+          <article id="evidence">
+            <h2>Evidence In Practice</h2>
+            <p>
+              Teams that review specs early usually reduce rework later. Why? Because disagreements surface when words are cheap,
+              not after implementation is expensive.
+            </p>
+            <p>
+              That is the narrative shift from reaction to intention.
+            </p>
+          </article>
+
+          <article id="workflow">
+            <h2>A Practical Workflow</h2>
+            <ul>
+              <li>Draft a one-page spec.</li>
+              <li>Review with teammates and stakeholders.</li>
+              <li>Use AI to challenge gaps and edge cases.</li>
+              <li>Lock scope and implement in small increments.</li>
+              <li>Validate against acceptance criteria, not assumptions.</li>
+            </ul>
+          </article>
+
+          <article id="takeaway">
+            <h2>Takeaway</h2>
+            <p>
+              Scrollytelling and specifications both solve the same thing: they guide attention in the right order.
+              First context, then evidence, then action.
+            </p>
+            <p>
+              If your process tells a clearer story, your product usually ships with fewer surprises.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo');
+      const backLink = document.getElementById('back-link');
+      if (backLink && returnTo) {
+        backLink.setAttribute('href', returnTo);
+      }
+    </script>
+  </body>
+</html>

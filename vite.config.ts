@@ -23,6 +23,7 @@ export default defineConfig({
         login: 'login.html',
         signup: 'signup.html',
         dashboard: 'dashboard.html',
+        whySpecDriven: 'why-spec-driven.html',
       },
     },
   },

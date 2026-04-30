@@ -20,6 +20,7 @@
           <li><a href="#why-specs">Why Specs?</a></li>
           <li><a href="#benefits">Benefits</a></li>
           <li><a href="#getting-started">Getting Started</a></li>
+          <li><a href="./why-spec-driven.html?returnTo=.%2Findex.html%23hero">Content Page</a></li>
           <li><a href="./login.html" class="btn-login">Login</a></li>
         </ul>
       </div>
@@ -28,7 +29,7 @@
     <!-- Main Content -->
     <main id="app">
       <!-- Section 1: Hero -->
-      <section id="hero" class="scroll-section hero-section">
+      <section id="hero" class="scroll-section hero-section is-visible">
         <div class="hero-content">
           <h1>Building Software Right</h1>
           <p class="hero-subtitle">A journey through spec-driven development.</p>
@@ -41,6 +42,7 @@
               Start Learning
             </button>
             <a href="./signup.html" class="btn btn-secondary">Create Account</a>
+            <a href="./why-spec-driven.html?returnTo=.%2Findex.html%23hero" class="btn btn-secondary">Read Content Story</a>
           </div>
         </div>
         <div class="hero-visual">
@@ -200,7 +202,7 @@ Acceptance Criteria:
         <p>Start your spec-driven development journey today.</p>
         <div class="cta-buttons">
           <a href="./signup.html" class="btn btn-primary">Create Free Account</a>
-          <a href="#" class="btn btn-secondary">Learn More</a>
+          <a href="./why-spec-driven.html?returnTo=.%2Findex.html%23cta" class="btn btn-secondary">Learn More</a>
         </div>
       </section>
     </main>
@@ -403,6 +405,54 @@ Acceptance Criteria:
           sendMessage();
         }
       });
+
+      // Scrollytelling section observer: reveals sections and highlights active nav anchor.
+      const storySections = Array.from(document.querySelectorAll('.scroll-section'));
+      const storyLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+
+      const setActiveStoryLink = (sectionId) => {
+        storyLinks.forEach((link) => {
+          const target = link.getAttribute('href')?.slice(1);
+          link.classList.toggle('active', target === sectionId);
+        });
+      };
+
+      if (storySections.length > 0) {
+        const storyObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                if (entry.target.id) {
+                  setActiveStoryLink(entry.target.id);
+                }
+              }
+            });
+          },
+          { threshold: 0.45, rootMargin: '-10% 0px -20% 0px' }
+        );
+
+        storySections.forEach((section) => storyObserver.observe(section));
+
+        const updateActiveByScroll = () => {
+          let currentId = storySections[0]?.id;
+          const offset = window.innerHeight * 0.35;
+
+          storySections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= offset && rect.bottom >= offset) {
+              currentId = section.id;
+            }
+          });
+
+          if (currentId) {
+            setActiveStoryLink(currentId);
+          }
+        };
+
+        updateActiveByScroll();
+        window.addEventListener('scroll', updateActiveByScroll, { passive: true });
+      }
 
       // Initial greeting
       addMessageToChat('👋 Hi! I\'m your DevLearn assistant. Ask me about spec-driven development!', 'assistant');
