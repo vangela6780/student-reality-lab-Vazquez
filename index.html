@@ -239,6 +239,7 @@ Acceptance Criteria:
       const chatSend = document.getElementById('chat-send');
       const chatInput = document.getElementById('chat-input');
       const chatMessages = document.getElementById('chat-messages');
+      const apiUrl = '/api/chat';
 
       // Toggle chat panel visibility
       chatToggle?.addEventListener('click', () => {
@@ -250,8 +251,18 @@ Acceptance Criteria:
         chatPanel?.classList.add('hidden');
       });
 
+      function setChatBusy(isBusy) {
+        if (chatSend) {
+          chatSend.disabled = isBusy;
+          chatSend.textContent = isBusy ? '...' : 'Send';
+        }
+        if (chatInput) {
+          chatInput.disabled = isBusy;
+        }
+      }
+
       // Send message
-      function sendMessage() {
+      async function sendMessage() {
         const message = chatInput?.value.trim();
         if (!message) return;
 
@@ -259,11 +270,95 @@ Acceptance Criteria:
         addMessageToChat(message, 'user');
         chatInput.value = '';
 
-        // Simulate AI response
-        setTimeout(() => {
-          const response = generateResponse(message);
-          addMessageToChat(response, 'assistant');
-        }, 500);
+        const assistantMessage = addMessageToChat('', 'assistant');
+        setChatBusy(true);
+
+        try {
+          await streamAssistantResponse(message, assistantMessage);
+        } catch (error) {
+          assistantMessage.textContent =
+            'I could not reach the AI service. Make sure the API server is running and OPENAI_API_KEY is set in ai-orchestration-nextjs/.env.local.';
+        } finally {
+          setChatBusy(false);
+        }
+      }
+
+      async function streamAssistantResponse(message, assistantNode) {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(`Chat API request failed (${response.status})`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let assembledText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const chunks = buffer.split('\n\n');
+          buffer = chunks.pop() || '';
+
+          for (const chunk of chunks) {
+            const parsed = parseSseChunk(chunk);
+            if (!parsed) continue;
+
+            if (parsed.event === 'text_delta' && parsed.data?.text) {
+              assembledText += parsed.data.text;
+              assistantNode.textContent = assembledText.trim();
+            }
+
+            if (parsed.event === 'approval_required') {
+              assembledText += '\n\nTool approval is required by the backend. Please run this request from the MCP chat panel for approval workflow.';
+              assistantNode.textContent = assembledText.trim();
+            }
+
+            if (parsed.event === 'error') {
+              assembledText += `\n\nError: ${parsed.data?.message || 'Unknown chat error.'}`;
+              assistantNode.textContent = assembledText.trim();
+            }
+          }
+        }
+
+        if (!assistantNode.textContent || assistantNode.textContent.trim().length === 0) {
+          assistantNode.textContent = 'No response received from the model.';
+        }
+      }
+
+      function parseSseChunk(chunk) {
+        const lines = chunk.split('\n');
+        let eventName = '';
+        let dataRaw = '';
+
+        for (const line of lines) {
+          if (line.startsWith('event:')) {
+            eventName = line.slice('event:'.length).trim();
+          }
+          if (line.startsWith('data:')) {
+            dataRaw += line.slice('data:'.length).trim();
+          }
+        }
+
+        if (!eventName) return null;
+
+        let data = {};
+        if (dataRaw) {
+          try {
+            data = JSON.parse(dataRaw);
+          } catch {
+            data = {};
+          }
+        }
+
+        return { event: eventName, data };
       }
 
       // Add message to chat interface
@@ -297,29 +392,7 @@ Acceptance Criteria:
         messageDiv.textContent = text;
         chatMessages?.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      // Generate simulated AI responses
-      function generateResponse(userMessage) {
-        const message = userMessage.toLowerCase();
-
-        const responses = {
-          'spec': 'A specification is a detailed description of what you\'re building. It includes requirements, user stories, and acceptance criteria.',
-          'how': 'To write an effective spec: 1) Define the problem, 2) List features, 3) Write user stories, 4) Get feedback from your team.',
-          'benefits': 'Specs save time, prevent scope creep, improve team alignment, and make testing easier. You\'ll catch bugs earlier.',
-          'example': 'Sure! A user story looks like: "As a student, I want to log in so I can access my courses." Include acceptance criteria too.',
-          'ai': 'AI tools like Claude excel with clear specs. Instead of guessing, you can ask: "Review this spec for gaps" or "Generate test cases."',
-          'hello': 'Hi! 👋 I\'m your DevLearn assistant. Ask me about specs, development best practices, or anything else!',
-          'help': 'I can help with:\n• Understanding specs\n• Best practices\n• Example specs\n• Tips for clear writing\nWhat would you like to know?',
-        };
-
-        for (const [keyword, response] of Object.entries(responses)) {
-          if (message.includes(keyword)) {
-            return response;
-          }
-        }
-
-        return '🤔 Great question! I\'m still learning. Try asking about "specs", "how to write specs", "benefits", or say "help" for options.';
+        return messageDiv;
       }
 
       // Event listeners
