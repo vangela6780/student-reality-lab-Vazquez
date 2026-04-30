@@ -3,12 +3,12 @@
  * Handles floating chat widget interactions
  */
 
-const chatToggle = document.getElementById('chat-toggle');
-const chatPanel = document.getElementById('chat-panel');
-const chatClose = document.getElementById('chat-close');
-const chatSend = document.getElementById('chat-send');
-const chatInput = document.getElementById('chat-input');
-const chatMessages = document.getElementById('chat-messages');
+const chatToggle = document.getElementById('chat-toggle') as HTMLButtonElement | null;
+const chatPanel = document.getElementById('chat-panel') as HTMLDivElement | null;
+const chatClose = document.getElementById('chat-close') as HTMLButtonElement | null;
+const chatSend = document.getElementById('chat-send') as HTMLButtonElement | null;
+const chatInput = document.getElementById('chat-input') as HTMLInputElement | null;
+const chatMessages = document.getElementById('chat-messages') as HTMLDivElement | null;
 
 // Toggle chat panel visibility
 chatToggle?.addEventListener('click', () => {
@@ -27,7 +27,9 @@ function sendMessage() {
 
   // Add user message to chat
   addMessageToChat(message, 'user');
-  chatInput!.value = '';
+  if (chatInput) {
+    chatInput.value = '';
+  }
 
   // Simulate AI response
   setTimeout(() => {
@@ -65,8 +67,12 @@ function addMessageToChat(text: string, sender: 'user' | 'assistant') {
   }
 
   messageDiv.textContent = text;
-  chatMessages?.appendChild(messageDiv);
-  chatMessages!.scrollTop = chatMessages!.scrollHeight;
+  if (!chatMessages) {
+    return;
+  }
+
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Generate simulated AI responses
