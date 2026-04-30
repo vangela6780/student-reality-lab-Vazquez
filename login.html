@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login | DevLearn</title>
-    <link rel="stylesheet" href="/src/style-light.css" />
+    <link rel="stylesheet" href="./src/style-light.css" />
     <style>
       .auth-container {
         min-height: 100vh;
@@ -156,12 +156,12 @@
         </form>
 
         <div class="auth-footer">
-          <p>Don't have an account? <a href="/signup.html">Create one</a></p>
+          <p>Don't have an account? <a href="./signup.html">Create one</a></p>
           <p><a href="#">Forgot your password?</a></p>
         </div>
 
         <div class="back-home">
-          <a href="/">← Back to Home</a>
+          <a href="./index.html">← Back to Home</a>
         </div>
       </div>
     </div>
@@ -177,7 +177,7 @@
         localStorage.setItem('is_logged_in', 'true');
         
         alert('Login successful! (Demo mode)\n\nEmail: ' + email);
-        window.location.href = '/dashboard.html';
+        window.location.href = './dashboard.html';
       });
     </script>
   </body>

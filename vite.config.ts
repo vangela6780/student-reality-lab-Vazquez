@@ -17,5 +17,13 @@ export default defineConfig({
   build: {
     outDir: 'build',
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        login: 'login.html',
+        signup: 'signup.html',
+        dashboard: 'dashboard.html',
+      },
+    },
   },
 })

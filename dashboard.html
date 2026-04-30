@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | DevLearn</title>
-    <link rel="stylesheet" href="/src/style-light.css" />
+    <link rel="stylesheet" href="./src/style-light.css" />
     <style>
       .dashboard-container {
         max-width: 1200px;
@@ -224,7 +224,7 @@
       </div>
 
       <div style="text-align: center; padding: 2rem; background: var(--bg-tertiary); border-radius: 12px;">
-        <p style="color: var(--text-secondary);">Want to learn more? <a href="/" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Return to home</a></p>
+        <p style="color: var(--text-secondary);">Want to learn more? <a href="./index.html" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Return to home</a></p>
       </div>
     </div>
 
@@ -233,7 +233,7 @@
       function checkAuth() {
         const isLoggedIn = localStorage.getItem('is_logged_in');
         if (!isLoggedIn) {
-          window.location.href = '/login.html';
+          window.location.href = './login.html';
         } else {
           const userName = localStorage.getItem('user_name') || 'Student';
           document.getElementById('user-display').textContent = userName;
@@ -244,7 +244,7 @@
         localStorage.removeItem('is_logged_in');
         localStorage.removeItem('user_name');
         localStorage.removeItem('user_email');
-        window.location.href = '/';
+        window.location.href = './index.html';
       }
 
       // Check auth on page load
