@@ -72,6 +72,8 @@ loadProcessedData()
 
 function displayInteractiveView(dataset: ProcessedDataset): void {
   const app = document.querySelector<HTMLDivElement>('#app')!;
+  const baseUrl = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.BASE_URL ?? '/';
+  const supportingPageHref = `${baseUrl}scrollytelling-update/why.html?returnTo=${encodeURIComponent(`${baseUrl}#hero`)}`;
 
   const pre2022 = dataset.data.filter((d) => d.year <= 2021);
   const post2021 = dataset.data.filter((d) => d.year >= 2022);
@@ -98,12 +100,21 @@ function displayInteractiveView(dataset: ProcessedDataset): void {
   const yearlyCasualtyDiff = dataset.data[dataset.data.length - 1].casualties - dataset.data[0].casualties;
   
   app.innerHTML = `
-    <header>
+    <header id="hero" class="hero-block">
       <h1>The Cost of Conflict: Budgets and War Consequences</h1>
       <p class="subtitle">Interactive Data Story (2018–2024)</p>
+      <p class="hero-lead">
+        This is a scrollytelling update: one guided narrative from context to evidence,
+        then to interpretation and action.
+      </p>
+      <div class="hero-actions">
+        <a class="hero-btn" href="#context">Start Story</a>
+        <a class="hero-btn hero-btn-secondary" href="${supportingPageHref}">Open Content Page</a>
+      </div>
     </header>
 
     <nav class="story-navbar" aria-label="Story navigation">
+      <a href="#hero" class="story-link">Hero</a>
       <a href="#ai-assistant" class="story-link">AI Assistant</a>
       <a href="#context" class="story-link">Context</a>
       <a href="#evidence" class="story-link">Evidence</a>

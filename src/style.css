@@ -92,6 +92,48 @@ header {
   position: relative;
 }
 
+.hero-block {
+  min-height: min(70vh, 620px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.hero-lead {
+  max-width: 60ch;
+  color: #252525;
+  font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.35rem;
+}
+
+.hero-btn {
+  font-family: 'Barlow Condensed', 'Franklin Gothic Medium', sans-serif;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.58rem 1rem;
+  color: #f8f8f8;
+  background: linear-gradient(180deg, var(--blue), #083680);
+}
+
+.hero-btn:hover,
+.hero-btn:focus-visible {
+  transform: translateY(-1px);
+}
+
+.hero-btn-secondary {
+  background: linear-gradient(180deg, #ffffff, #ececec);
+  color: var(--ink);
+}
+
 header::after {
   content: '';
   position: absolute;
