@@ -3,68 +3,317 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Angela's Midterm Project | The Cost of War</title>
-    <meta name="description" content="Data-driven exploration of war's impact on humanity, society, and student life" />
+    <title>DevLearn | Building Software Right</title>
+    <meta name="description" content="Learn spec-driven development through interactive scrollytelling. Master how to build software the right way, from the start." />
+    <link rel="stylesheet" href="/src/style-light.css" />
   </head>
   <body>
-    <div id="app">
-      <header>
-        <h1>The Cost of War</h1>
-        <p class="subtitle">Understanding the impact on humanity and society</p>
-      </header>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h2>DevLearn</h2>
+          <span class="tagline">Build Right From Start</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#why-specs">Why Specs?</a></li>
+          <li><a href="#benefits">Benefits</a></li>
+          <li><a href="#getting-started">Getting Started</a></li>
+          <li><a href="/login.html" class="btn-login">Login</a></li>
+        </ul>
+      </div>
+    </nav>
 
-      <main>
-        <section id="intro">
-          <h2>Essential Question</h2>
-          <p class="question">What is the cost of war to humanity and society?</p>
-          
-          <div class="claim">
-            <h3>Hypothesis</h3>
-            <p>War costs homes, lives, and money; it harms people and ecosystems, and the public should care more about those consequences.</p>
+    <!-- Main Content -->
+    <main id="app">
+      <!-- Section 1: Hero -->
+      <section id="hero" class="scroll-section hero-section">
+        <div class="hero-content">
+          <h1>Building Software Right</h1>
+          <p class="hero-subtitle">A journey through spec-driven development.</p>
+          <p class="hero-description">
+            Stop guessing. Start planning. Learn how specifications transform chaos into clarity, 
+            and how AI can help you do it better.
+          </p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" onclick="document.getElementById('why-specs').scrollIntoView({behavior: 'smooth'})">
+              Start Learning
+            </button>
+            <a href="/signup.html" class="btn btn-secondary">Create Account</a>
           </div>
-        </section>
+        </div>
+        <div class="hero-visual">
+          <div class="visual-block"></div>
+        </div>
+      </section>
 
-        <section id="data-summary">
-          <h2>Data Overview</h2>
-          <div id="summary-cards" class="card-grid">
-            <div class="card loading">Loading data...</div>
+      <!-- Section 2: The Problem -->
+      <section id="why-specs" class="scroll-section">
+        <h2>The 90% Problem</h2>
+        <div class="content-grid">
+          <div class="content-box">
+            <h3>📋 How Most Projects Start</h3>
+            <p>
+              A manager says "build a user dashboard." Developers jump straight into code. 
+              Two weeks later: feature creep, unclear requirements, rewrites. 
+              <strong>90% of development time is wasted</strong> on guessing what to build.
+            </p>
           </div>
-        </section>
-
-        <section id="visualization">
-          <h2>Key Metrics</h2>
-          <div id="chart-container">
-            <p class="note">Interactive visualization will be added in Phase 3</p>
+          <div class="content-box highlight">
+            <h3>✅ How Spec-Driven Projects Start</h3>
+            <p>
+              <strong>First:</strong> Write a specification.<br/>
+              <strong>Then:</strong> Review with team + AI.<br/>
+              <strong>Finally:</strong> Code with confidence.
+            </p>
+            <p class="metric">Result: 40-60% faster development. Zero surprises.</p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="data-table">
-          <h2>Dataset</h2>
-          <div id="table-container">
-            <table id="data-display">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Military Spending ($B)</th>
-                  <th>CPI Index</th>
-                  <th>Education Gap ($B)</th>
-                  <th>Casualties</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="5">Loading...</td></tr>
-              </tbody>
-            </table>
+      <!-- Section 3: What is a Spec? -->
+      <section id="what-is-spec" class="scroll-section">
+        <h2>What Is a Specification?</h2>
+        <div class="spec-example">
+          <div class="spec-box">
+            <h4>A spec isn't fancy. It's just clear.</h4>
+            <ul class="spec-checklist">
+              <li>✓ What problem are we solving?</li>
+              <li>✓ Who are the users?</li>
+              <li>✓ What features matter first?</li>
+              <li>✓ How do we know it works?</li>
+              <li>✓ What are the constraints?</li>
+            </ul>
           </div>
-        </section>
-      </main>
+          <div class="spec-box example">
+            <h4>Example: User Login</h4>
+            <pre><code>User Story:
+"As a student, I want to log in 
+so I can access my courses."
 
-      <footer>
-        <p>&copy; 2026 Angela Vazquez | Student Reality Lab</p>
-        <p class="data-source">Data sources: SIPRI, BLS, Brown University Costs of War Project</p>
-      </footer>
+Acceptance Criteria:
+- Email + password fields
+- Error messages for invalid creds
+- Redirect to dashboard on success
+- Session persistence (7 days)</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Benefits -->
+      <section id="benefits" class="scroll-section">
+        <h2>Why Specs Matter</h2>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">⚡</div>
+            <h3>Faster Development</h3>
+            <p>No ambiguity. No rewrites. Developers know exactly what to build.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🤝</div>
+            <h3>Team Alignment</h3>
+            <p>Everyone reads the same spec. Fewer meetings, better decisions.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🧠</div>
+            <h3>AI-Ready</h3>
+            <p>Claude, ChatGPT, and other tools excel with clear specs. Get better code.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">📊</div>
+            <h3>Measurable Quality</h3>
+            <p>Spec defines "done." Test against it. Ship with confidence.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Getting Started -->
+      <section id="getting-started" class="scroll-section">
+        <h2>Your First Spec</h2>
+        <div class="steps-container">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Define the Problem</h3>
+            <p>"What are we building and why?"</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>List Features</h3>
+            <p>Prioritize: must-have, nice-to-have, future.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Write User Stories</h3>
+            <p>"As a [user], I want [feature] so that [benefit]."</p>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <h3>Use AI to Review</h3>
+            <p>Paste your spec → Ask Claude for gaps and improvements.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">5</div>
+            <h3>Build with Confidence</h3>
+            <p>Code follows the spec. Quality assured.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6: Call to Action -->
+      <section id="cta" class="scroll-section cta-section">
+        <h2>Ready to Build Right?</h2>
+        <p>Start your spec-driven development journey today.</p>
+        <div class="cta-buttons">
+          <a href="/signup.html" class="btn btn-primary">Create Free Account</a>
+          <a href="#" class="btn btn-secondary">Learn More</a>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <p>&copy; 2026 DevLearn | Built by Angela Vazquez</p>
+        <p>Empowering students through spec-driven development.</p>
+      </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div id="chat-widget" class="chat-widget">
+      <button id="chat-toggle" class="chat-toggle" title="Open Assistant">
+        <span class="chat-icon">💬</span>
+      </button>
+      <div id="chat-panel" class="chat-panel hidden">
+        <div class="chat-header">
+          <h3>DevLearn Assistant</h3>
+          <button id="chat-close" class="chat-close">&times;</button>
+        </div>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" placeholder="Ask me about specs..." />
+          <button id="chat-send">Send</button>
+        </div>
+      </div>
     </div>
-    
-    <script type="module" src="/src/main.ts"></script>
+
+    <script>
+      // Chat Widget Handler - Floating Assistant
+      const chatToggle = document.getElementById('chat-toggle');
+      const chatPanel = document.getElementById('chat-panel');
+      const chatClose = document.getElementById('chat-close');
+      const chatSend = document.getElementById('chat-send');
+      const chatInput = document.getElementById('chat-input');
+      const chatMessages = document.getElementById('chat-messages');
+
+      // Toggle chat panel visibility
+      chatToggle?.addEventListener('click', () => {
+        chatPanel?.classList.toggle('hidden');
+      });
+
+      // Close chat panel
+      chatClose?.addEventListener('click', () => {
+        chatPanel?.classList.add('hidden');
+      });
+
+      // Send message
+      function sendMessage() {
+        const message = chatInput?.value.trim();
+        if (!message) return;
+
+        // Add user message to chat
+        addMessageToChat(message, 'user');
+        chatInput.value = '';
+
+        // Simulate AI response
+        setTimeout(() => {
+          const response = generateResponse(message);
+          addMessageToChat(response, 'assistant');
+        }, 500);
+      }
+
+      // Add message to chat interface
+      function addMessageToChat(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+          padding: 0.75rem;
+          border-radius: 8px;
+          line-height: 1.4;
+          font-size: 0.95rem;
+          word-wrap: break-word;
+          animation: fadeIn 0.3s ease;
+        `;
+
+        if (sender === 'user') {
+          messageDiv.style.cssText += `
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            margin-left: 2rem;
+          `;
+        } else {
+          messageDiv.style.cssText += `
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            align-self: flex-start;
+            margin-right: 2rem;
+          `;
+        }
+
+        messageDiv.textContent = text;
+        chatMessages?.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Generate simulated AI responses
+      function generateResponse(userMessage) {
+        const message = userMessage.toLowerCase();
+
+        const responses = {
+          'spec': 'A specification is a detailed description of what you\'re building. It includes requirements, user stories, and acceptance criteria.',
+          'how': 'To write an effective spec: 1) Define the problem, 2) List features, 3) Write user stories, 4) Get feedback from your team.',
+          'benefits': 'Specs save time, prevent scope creep, improve team alignment, and make testing easier. You\'ll catch bugs earlier.',
+          'example': 'Sure! A user story looks like: "As a student, I want to log in so I can access my courses." Include acceptance criteria too.',
+          'ai': 'AI tools like Claude excel with clear specs. Instead of guessing, you can ask: "Review this spec for gaps" or "Generate test cases."',
+          'hello': 'Hi! 👋 I\'m your DevLearn assistant. Ask me about specs, development best practices, or anything else!',
+          'help': 'I can help with:\n• Understanding specs\n• Best practices\n• Example specs\n• Tips for clear writing\nWhat would you like to know?',
+        };
+
+        for (const [keyword, response] of Object.entries(responses)) {
+          if (message.includes(keyword)) {
+            return response;
+          }
+        }
+
+        return '🤔 Great question! I\'m still learning. Try asking about "specs", "how to write specs", "benefits", or say "help" for options.';
+      }
+
+      // Event listeners
+      chatSend?.addEventListener('click', sendMessage);
+      chatInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+
+      // Initial greeting
+      addMessageToChat('👋 Hi! I\'m your DevLearn assistant. Ask me about spec-driven development!', 'assistant');
+
+      // Animation keyframes
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
   </body>
 </html>

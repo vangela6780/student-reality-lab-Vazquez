@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | DevLearn</title>
+    <link rel="stylesheet" href="/src/style-light.css" />
+    <style>
+      .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+      }
+
+      .dashboard-header h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+      }
+
+      .user-menu {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .logout-btn {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        background: #d32f2f;
+      }
+
+      .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .course-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .course-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-4px);
+      }
+
+      .course-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: white;
+        padding: 2rem;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .course-header h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        color: white;
+      }
+
+      .course-header p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+
+      .course-body {
+        padding: 1.5rem;
+      }
+
+      .course-progress {
+        background: var(--bg-tertiary);
+        border-radius: 6px;
+        height: 8px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+
+      .course-progress-bar {
+        background: var(--success-color);
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+
+      .course-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+      }
+
+      .course-action {
+        display: inline-block;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .course-action:hover {
+        color: var(--primary-hover);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: var(--bg-tertiary);
+        border-radius: 12px;
+      }
+
+      .empty-state h2 {
+        margin-bottom: 1rem;
+      }
+
+      .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h2>DevLearn</h2>
+          <span class="tagline">Build Right From Start</span>
+        </div>
+        <div style="flex: 1;"></div>
+        <div class="user-menu">
+          <span class="user-name" id="user-display">Student</span>
+          <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1>My Courses</h1>
+      </div>
+
+      <div class="courses-grid">
+        <!-- Course 1 -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Spec-Driven Development 101</h3>
+            <p>Learn the fundamentals</p>
+          </div>
+          <div class="course-body">
+            <div class="course-progress">
+              <div class="course-progress-bar" style="width: 45%;"></div>
+            </div>
+            <div class="course-meta">
+              <span>45% complete</span>
+              <span>5 lessons</span>
+            </div>
+            <a href="#" class="course-action">Continue →</a>
+          </div>
+        </div>
+
+        <!-- Course 2 -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>Writing Effective Specs</h3>
+            <p>Advanced techniques</p>
+          </div>
+          <div class="course-body">
+            <div class="course-progress">
+              <div class="course-progress-bar" style="width: 0%;"></div>
+            </div>
+            <div class="course-meta">
+              <span>0% complete</span>
+              <span>8 lessons</span>
+            </div>
+            <a href="#" class="course-action">Start →</a>
+          </div>
+        </div>
+
+        <!-- Course 3 -->
+        <div class="course-card">
+          <div class="course-header">
+            <h3>AI & Specifications</h3>
+            <p>Using AI to improve specs</p>
+          </div>
+          <div class="course-body">
+            <div class="course-progress">
+              <div class="course-progress-bar" style="width: 75%;"></div>
+            </div>
+            <div class="course-meta">
+              <span>75% complete</span>
+              <span>6 lessons</span>
+            </div>
+            <a href="#" class="course-action">Continue →</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding: 2rem; background: var(--bg-tertiary); border-radius: 12px;">
+        <p style="color: var(--text-secondary);">Want to learn more? <a href="/" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Return to home</a></p>
+      </div>
+    </div>
+
+    <script>
+      // Check if user is logged in
+      function checkAuth() {
+        const isLoggedIn = localStorage.getItem('is_logged_in');
+        if (!isLoggedIn) {
+          window.location.href = '/login.html';
+        } else {
+          const userName = localStorage.getItem('user_name') || 'Student';
+          document.getElementById('user-display').textContent = userName;
+        }
+      }
+
+      function handleLogout() {
+        localStorage.removeItem('is_logged_in');
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('user_email');
+        window.location.href = '/';
+      }
+
+      // Check auth on page load
+      checkAuth();
+    </script>
+  </body>
+</html>
