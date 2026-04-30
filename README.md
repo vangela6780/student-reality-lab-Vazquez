@@ -1,5 +1,13 @@
 # Angela's Midterm Project
 
+## Scrollytelling Update (Spec-Driven)
+
+- Story module page: `/scrollytelling-update/index.html`
+- Supporting page: `/scrollytelling-update/why.html`
+- Spec: `docs/specs/SPEC-002-scrollytelling-update.md`
+- Sprint: `docs/sprints/SPRINT-002-scrollytelling-update.md`
+- Traceability: `docs/specs/TRACEABILITY-SPEC-002.md`
+
 ## Essential Question (1 sentence)
 What is the cost of war to humanity and society?
 
