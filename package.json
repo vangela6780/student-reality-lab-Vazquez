@@ -10,6 +10,8 @@
     "dev:all": "concurrently \"npm:dev\" \"npm:dev:api\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "process-data": "tsx src/lib/processData.ts",
     "cli": "node cli/index.js",
     "cli:help": "node cli/index.js help",
@@ -23,6 +25,7 @@
     "playwright": "^1.54.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.2",
     "concurrently": "^9.1.2",
     "tsx": "^4.19.2",

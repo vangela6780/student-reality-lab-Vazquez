@@ -8,3 +8,5 @@ ai-orchestration-nextjs/.next/
 ai-orchestration-nextjs/.env.local
 
 *.tsbuildinfo
+playwright-report/
+test-results/

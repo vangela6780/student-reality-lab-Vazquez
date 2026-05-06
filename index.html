@@ -9,18 +9,18 @@
   </head>
   <body>
     <!-- Navigation Header -->
-    <nav class="navbar">
+    <nav class="navbar" data-testid="main-nav">
       <div class="navbar-container">
         <div class="logo">
           <h2>DevLearn</h2>
           <span class="tagline">Build Right From Start</span>
         </div>
-        <ul class="nav-links">
+        <ul class="nav-links" data-testid="nav-links">
           <li><a href="#hero">Home</a></li>
           <li><a href="#why-specs">Why Specs?</a></li>
           <li><a href="#benefits">Benefits</a></li>
           <li><a href="#getting-started">Getting Started</a></li>
-          <li><a href="./why-spec-driven.html?returnTo=.%2Findex.html%23hero">Content Page</a></li>
+          <li><a href="./why-spec-driven.html?returnTo=.%2Findex.html%23hero" data-testid="nav-content-page">Content Page</a></li>
           <li><a href="./login.html" class="btn-login">Login</a></li>
         </ul>
       </div>
@@ -29,7 +29,7 @@
     <!-- Main Content -->
     <main id="app">
       <!-- Section 1: Hero -->
-      <section id="hero" class="scroll-section hero-section is-visible">
+      <section id="hero" class="scroll-section hero-section is-visible" data-testid="hero-section">
         <div class="hero-content">
           <h1>Building Software Right</h1>
           <p class="hero-subtitle">A journey through spec-driven development.</p>
@@ -85,7 +85,7 @@
       </section>
 
       <!-- Section 2: The Problem -->
-      <section id="why-specs" class="scroll-section">
+      <section id="why-specs" class="scroll-section" data-testid="why-specs-section">
         <h2>The 90% Problem</h2>
         <div class="content-grid">
           <div class="content-box">
@@ -109,7 +109,7 @@
       </section>
 
       <!-- Section 3: What is a Spec? -->
-      <section id="what-is-spec" class="scroll-section">
+      <section id="what-is-spec" class="scroll-section" data-testid="what-is-spec-section">
         <h2>What Is a Specification?</h2>
         <div class="spec-example">
           <div class="spec-box">
@@ -138,7 +138,7 @@ Acceptance Criteria:
       </section>
 
       <!-- Section 4: Benefits -->
-      <section id="benefits" class="scroll-section">
+      <section id="benefits" class="scroll-section" data-testid="benefits-section">
         <h2>Why Specs Matter</h2>
         <div class="benefits-grid">
           <div class="benefit-card">
@@ -165,7 +165,7 @@ Acceptance Criteria:
       </section>
 
       <!-- Section 5: Getting Started -->
-      <section id="getting-started" class="scroll-section">
+      <section id="getting-started" class="scroll-section" data-testid="getting-started-section">
         <h2>Your First Spec</h2>
         <div class="steps-container">
           <div class="step">
@@ -197,7 +197,7 @@ Acceptance Criteria:
       </section>
 
       <!-- Section 6: Call to Action -->
-      <section id="cta" class="scroll-section cta-section">
+      <section id="cta" class="scroll-section cta-section" data-testid="cta-section">
         <h2>Ready to Build Right?</h2>
         <p>Start your spec-driven development journey today.</p>
         <div class="cta-buttons">
@@ -216,19 +216,19 @@ Acceptance Criteria:
     </footer>
 
     <!-- Floating Chat Widget -->
-    <div id="chat-widget" class="chat-widget">
-      <button id="chat-toggle" class="chat-toggle" title="Open Assistant">
+    <div id="chat-widget" class="chat-widget" data-testid="chat-widget">
+      <button id="chat-toggle" class="chat-toggle" title="Open Assistant" data-testid="chat-toggle">
         <span class="chat-icon">💬</span>
       </button>
-      <div id="chat-panel" class="chat-panel hidden">
+      <div id="chat-panel" class="chat-panel hidden" data-testid="chat-panel">
         <div class="chat-header">
           <h3>DevLearn Assistant</h3>
-          <button id="chat-close" class="chat-close">&times;</button>
+          <button id="chat-close" class="chat-close" data-testid="chat-close">&times;</button>
         </div>
-        <div id="chat-messages" class="chat-messages"></div>
+        <div id="chat-messages" class="chat-messages" data-testid="chat-messages"></div>
         <div class="chat-input-area">
-          <input type="text" id="chat-input" placeholder="Ask me about specs..." />
-          <button id="chat-send">Send</button>
+          <input type="text" id="chat-input" placeholder="Ask me about specs..." data-testid="chat-input" />
+          <button id="chat-send" data-testid="chat-send">Send</button>
         </div>
       </div>
     </div>
@@ -287,7 +287,8 @@ Acceptance Criteria:
       }
 
       async function streamAssistantResponse(message, assistantNode) {
-        const response = await fetch(apiUrl, {
+        const simpleApiUrl = 'https://ai-orchestration-nextjs.vercel.app/api/simple-chat';
+        const response = await fetch(simpleApiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message }),
@@ -297,43 +298,10 @@ Acceptance Criteria:
           throw new Error(`Chat API request failed (${response.status})`);
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let assembledText = '';
+        const data = await response.json();
+        const reply = data.reply || 'No response from AI.';
+        assistantNode.textContent = reply;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const chunks = buffer.split('\n\n');
-          buffer = chunks.pop() || '';
-
-          for (const chunk of chunks) {
-            const parsed = parseSseChunk(chunk);
-            if (!parsed) continue;
-
-            if (parsed.event === 'text_delta' && parsed.data?.text) {
-              assembledText += parsed.data.text;
-              assistantNode.textContent = assembledText.trim();
-            }
-
-            if (parsed.event === 'approval_required') {
-              assembledText += '\n\nTool approval is required by the backend. Please run this request from the MCP chat panel for approval workflow.';
-              assistantNode.textContent = assembledText.trim();
-            }
-
-            if (parsed.event === 'error') {
-              assembledText += `\n\nError: ${parsed.data?.message || 'Unknown chat error.'}`;
-              assistantNode.textContent = assembledText.trim();
-            }
-          }
-        }
-
-        if (!assistantNode.textContent || assistantNode.textContent.trim().length === 0) {
-          assistantNode.textContent = 'No response received from the model.';
-        }
       }
 
       function parseSseChunk(chunk) {
