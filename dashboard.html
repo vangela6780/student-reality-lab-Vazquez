@@ -223,32 +223,63 @@
         </div>
       </div>
 
-      <div style="text-align: center; padding: 2rem; background: var(--bg-tertiary); border-radius: 12px;">
+      <section id="dashboard-assistant" class="assistant-dashboard-shell">
+        <div class="assistant-sidebar">
+          <div class="assistant-sidebar-header">
+            <h2>AI Chat</h2>
+            <button id="assistant-new-chat" type="button" class="assistant-new-btn">New Chat</button>
+          </div>
+          <input id="assistant-search" class="assistant-search" type="search" placeholder="Search conversations" />
+          <div id="assistant-conversation-list" class="assistant-conversation-list"></div>
+        </div>
+        <div class="assistant-main">
+          <div class="assistant-main-header">
+            <h3>Assistant</h3>
+            <span id="dashboard-chat-usage" class="chat-usage-label">Signed in</span>
+          </div>
+          <div id="dashboard-chat-messages" class="chat-messages dashboard-chat-messages"></div>
+          <div class="chat-input-area dashboard-chat-input-area">
+            <input id="dashboard-chat-input" type="text" placeholder="Continue your conversation..." />
+            <button id="dashboard-chat-send" type="button">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <div style="text-align: center; padding: 2rem; background: var(--bg-tertiary); border-radius: 12px; margin-top: 2rem;">
         <p style="color: var(--text-secondary);">Want to learn more? <a href="./index.html" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Return to home</a></p>
       </div>
     </div>
 
-    <script>
-      // Check if user is logged in
+    <script type="module">
+      import { initDashboardAssistant, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
+
       function checkAuth() {
-        const isLoggedIn = localStorage.getItem('is_logged_in');
-        if (!isLoggedIn) {
-          window.location.href = './login.html';
-        } else {
-          const userName = localStorage.getItem('user_name') || 'Student';
-          document.getElementById('user-display').textContent = userName;
+        const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+        const email = localStorage.getItem('user_email');
+        if (!isLoggedIn || !email) {
+          const returnTo = encodeURIComponent('./dashboard.html');
+          window.location.href = `./login.html?returnTo=${returnTo}`;
+          return;
         }
+
+        const userName = localStorage.getItem('user_name') || 'Student';
+        document.getElementById('user-display').textContent = userName;
       }
 
-      function handleLogout() {
+      async function bootstrapDashboard() {
+        checkAuth();
+        await migrateGuestConversationsAfterAuth();
+        initDashboardAssistant();
+      }
+
+      window.handleLogout = function handleLogout() {
         localStorage.removeItem('is_logged_in');
         localStorage.removeItem('user_name');
         localStorage.removeItem('user_email');
         window.location.href = './index.html';
-      }
+      };
 
-      // Check auth on page load
-      checkAuth();
+      bootstrapDashboard();
     </script>
   </body>
 </html>

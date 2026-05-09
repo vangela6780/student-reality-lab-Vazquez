@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+import { assertRateLimit, getClientIp } from '@/lib/chat/persistence';
 
 export const runtime = 'nodejs';
 
@@ -12,11 +13,20 @@ const corsHeaders = {
 
 export async function POST(request: Request) {
   try {
+    assertRateLimit(getClientIp(request), 90, 60_000);
+
     const body = await request.json();
-    const message = body.message?.trim();
+    const message = String(body.message || '').trim();
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Missing message' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (message.length > 4000) {
+      return new Response(JSON.stringify({ error: 'Message too long (max 4000 characters)' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -51,6 +61,13 @@ export async function POST(request: Request) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('❌ Chat API Error:', errorMessage);
+
+    if (errorMessage === 'RATE_LIMITED') {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please wait and try again.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Provide specific error messages for common issues
     let userMessage = 'Failed to generate response';

@@ -177,27 +177,34 @@
       </div>
     </div>
 
-    <script>
-      document.getElementById('signup-form').addEventListener('submit', function(e) {
+    <script type="module">
+      import { getPostAuthRedirect, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
+
+      document.getElementById('signup-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
 
         if (password !== confirmPassword) {
-          alert('Passwords do not match!');
+          alert('Passwords do not match.');
           return;
         }
 
-        // Store in localStorage (demo only - no real backend)
+        if (!name || !email) {
+          alert('Please provide your name and email.');
+          return;
+        }
+
+        // Demo auth storage for static site.
         localStorage.setItem('user_name', name);
         localStorage.setItem('user_email', email);
         localStorage.setItem('is_logged_in', 'true');
-        
-        alert('Account created successfully! (Demo mode)\n\nName: ' + name + '\nEmail: ' + email);
-        window.location.href = './dashboard.html';
+
+        await migrateGuestConversationsAfterAuth();
+        window.location.href = getPostAuthRedirect('./dashboard.html');
       });
     </script>
   </body>

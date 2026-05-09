@@ -166,18 +166,30 @@
       </div>
     </div>
 
-    <script>
-      document.getElementById('login-form').addEventListener('submit', function(e) {
+    <script type="module">
+      import { getPostAuthRedirect, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
+
+      document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('email').value;
+
+        const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value;
-        
-        // Store in localStorage (demo only - no real backend)
+
+        if (!email || !password) {
+          alert('Please enter email and password.');
+          return;
+        }
+
+        // Demo auth storage for static site.
         localStorage.setItem('user_email', email);
         localStorage.setItem('is_logged_in', 'true');
-        
-        alert('Login successful! (Demo mode)\n\nEmail: ' + email);
-        window.location.href = './dashboard.html';
+
+        if (!localStorage.getItem('user_name')) {
+          localStorage.setItem('user_name', email.split('@')[0]);
+        }
+
+        await migrateGuestConversationsAfterAuth();
+        window.location.href = getPostAuthRedirect('./dashboard.html');
       });
     </script>
   </body>

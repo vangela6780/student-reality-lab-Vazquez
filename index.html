@@ -223,7 +223,10 @@ Acceptance Criteria:
       </button>
       <div id="chat-panel" class="chat-panel hidden" data-testid="chat-panel">
         <div class="chat-header">
-          <h3>DevLearn Assistant</h3>
+          <div>
+            <h3>DevLearn Assistant</h3>
+            <p id="chat-usage-label" class="chat-usage-label">8 free prompts left</p>
+          </div>
           <button id="chat-close" class="chat-close" data-testid="chat-close">&times;</button>
         </div>
         <div id="chat-messages" class="chat-messages" data-testid="chat-messages"></div>
@@ -234,167 +237,10 @@ Acceptance Criteria:
       </div>
     </div>
 
-    <script>
-      // Chat Widget Handler - Floating Assistant
-      const chatToggle = document.getElementById('chat-toggle');
-      const chatPanel = document.getElementById('chat-panel');
-      const chatClose = document.getElementById('chat-close');
-      const chatSend = document.getElementById('chat-send');
-      const chatInput = document.getElementById('chat-input');
-      const chatMessages = document.getElementById('chat-messages');
+    <script type="module">
+      import { initHomeChatWidget } from './src/lib/chat-experience.js';
 
-      // ✅ SECURITY FIX: Read backend URL from Vite HTML env injection.
-      // If the placeholder wasn't replaced, fall back to /api for local development.
-      const backendUrlMeta = document.querySelector('meta[name="backend-url"]')?.getAttribute('content') || '';
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const fallbackBackend = isLocalhost
-        ? '/api'
-        : 'https://ai-orchestration-nextjs.vercel.app/api';
-      const resolvedBackend = backendUrlMeta && !backendUrlMeta.includes('%VITE_BACKEND_URL%')
-        ? backendUrlMeta
-        : fallbackBackend;
-      const backendBase = resolvedBackend.replace(/\/$/, '');
-      const simpleChatUrl = `${backendBase}/simple-chat`;
-
-      // Toggle chat panel visibility
-      chatToggle?.addEventListener('click', () => {
-        chatPanel?.classList.toggle('hidden');
-      });
-
-      // Close chat panel
-      chatClose?.addEventListener('click', () => {
-        chatPanel?.classList.add('hidden');
-      });
-
-      function setChatBusy(isBusy) {
-        if (chatSend) {
-          chatSend.disabled = isBusy;
-          chatSend.textContent = isBusy ? '...' : 'Send';
-        }
-        if (chatInput) {
-          chatInput.disabled = isBusy;
-        }
-      }
-
-      // Send message
-      async function sendMessage() {
-        const message = chatInput?.value.trim();
-        if (!message) return;
-
-        // Add user message to chat
-        addMessageToChat(message, 'user');
-        chatInput.value = '';
-
-        const assistantMessage = addMessageToChat('', 'assistant');
-        setChatBusy(true);
-
-        try {
-          await streamAssistantResponse(message, assistantMessage);
-        } catch (error) {
-          const detail = error instanceof Error ? error.message : String(error);
-          assistantMessage.textContent = `❌ Error: ${detail}`;
-          console.error('Chat error:', detail);
-        } finally {
-          setChatBusy(false);
-        }
-      }
-
-      async function streamAssistantResponse(message, assistantNode) {
-        // ✅ SECURITY FIX: Use configured backend URL instead of hardcoded URL
-        const response = await fetch(simpleChatUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message }),
-        });
-
-        // Always try to parse JSON response
-        const data = await response.json().catch(() => ({}));
-
-        // Check if response was successful
-        if (!response.ok) {
-          const errorMsg = data.error || `Server error (${response.status})`;
-          throw new Error(errorMsg);
-        }
-
-        // Check for error in successful response
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        // Display the AI response
-        const reply = data.reply || 'No response from AI.';
-        assistantNode.textContent = reply;
-      }
-
-      function parseSseChunk(chunk) {
-        const lines = chunk.split('\n');
-        let eventName = '';
-        let dataRaw = '';
-
-        for (const line of lines) {
-          if (line.startsWith('event:')) {
-            eventName = line.slice('event:'.length).trim();
-          }
-          if (line.startsWith('data:')) {
-            dataRaw += line.slice('data:'.length).trim();
-          }
-        }
-
-        if (!eventName) return null;
-
-        let data = {};
-        if (dataRaw) {
-          try {
-            data = JSON.parse(dataRaw);
-          } catch {
-            data = {};
-          }
-        }
-
-        return { event: eventName, data };
-      }
-
-      // Add message to chat interface
-      function addMessageToChat(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.style.cssText = `
-          padding: 0.75rem;
-          border-radius: 8px;
-          line-height: 1.4;
-          font-size: 0.95rem;
-          word-wrap: break-word;
-          animation: fadeIn 0.3s ease;
-        `;
-
-        if (sender === 'user') {
-          messageDiv.style.cssText += `
-            background: var(--primary-color);
-            color: white;
-            align-self: flex-end;
-            margin-left: 2rem;
-          `;
-        } else {
-          messageDiv.style.cssText += `
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            align-self: flex-start;
-            margin-right: 2rem;
-          `;
-        }
-
-        messageDiv.textContent = text;
-        chatMessages?.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        return messageDiv;
-      }
-
-      // Event listeners
-      chatSend?.addEventListener('click', sendMessage);
-      chatInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendMessage();
-        }
-      });
+      initHomeChatWidget();
 
       // Scrollytelling section observer: reveals sections and highlights active nav anchor.
       const storySections = Array.from(document.querySelectorAll('.scroll-section'));
@@ -443,25 +289,6 @@ Acceptance Criteria:
         updateActiveByScroll();
         window.addEventListener('scroll', updateActiveByScroll, { passive: true });
       }
-
-      // Initial greeting
-      addMessageToChat('👋 Hi! I\'m your DevLearn assistant. Ask me about spec-driven development!', 'assistant');
-
-      // Animation keyframes
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `;
-      document.head.appendChild(style);
     </script>
   </body>
 </html>
