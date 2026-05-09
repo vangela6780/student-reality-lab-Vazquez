@@ -67,6 +67,36 @@ function getBackendBase() {
   return (unresolved ? fallback : metaValue).replace(/\/$/, '');
 }
 
+function showErrorNotification(message, duration = 5000) {
+  // Remove existing notifications
+  const existing = document.querySelector('.error-notification');
+  if (existing) existing.remove();
+
+  const notification = document.createElement('div');
+  notification.className = 'error-notification';
+  notification.innerHTML = `
+    <div class="error-notification-content">
+      <strong>⚠️ Error:</strong> ${escapeHtml(message)}
+      <button type="button" class="error-notification-close">×</button>
+    </div>
+  `;
+
+  notification.querySelector('.error-notification-close')?.addEventListener('click', () => {
+    notification.remove();
+  });
+
+  document.body.appendChild(notification);
+
+  if (duration > 0) {
+    setTimeout(() => {
+      notification.classList.add('error-notification-fade');
+      setTimeout(() => notification.remove(), 300);
+    }, duration);
+  }
+
+  return notification;
+}
+
 function getGuestSessionId() {
   let id = localStorage.getItem(STORAGE_KEYS.guestSessionId);
   if (!id) {
@@ -201,13 +231,22 @@ async function syncConversationToBackend(apiBase, ownerKey, conversation) {
 
   const userId = ownerKey.replace('user:', '');
   try {
-    await fetch(`${apiBase}/conversations/sync`, {
+    const response = await fetch(`${apiBase}/conversations/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, conversation }),
     });
-  } catch {
-    // Keep local data as fallback when network sync fails.
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      const error = payload.error || `Server error (${response.status})`;
+      console.warn('[Sync] Backend sync failed:', error, 'Local data retained.');
+      // Silently continue - local data is authoritative
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('[Sync] Network error during backend sync:', message);
+    // Silently continue - local data is authoritative
   }
 }
 
@@ -380,7 +419,8 @@ function createChatController(options) {
 
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(payload.error || `Server error (${response.status})`);
+        const errorMsg = payload.error || `Server error (${response.status})`;
+        throw new Error(errorMsg);
       }
 
       const reply = String(payload.reply || 'No response from AI.');
@@ -389,7 +429,9 @@ function createChatController(options) {
       await syncConversationToBackend(apiBase, conversation.ownerKey, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown chat error';
-      conversation.messages.push(createMessage('assistant', `Error: ${message}`));
+      showErrorNotification(message, 6000);
+      // Remove the failed user message - don't save it since we couldn't get a response
+      conversation.messages.pop();
       saveConversation();
     } finally {
       loading = false;
@@ -579,7 +621,7 @@ export async function migrateGuestConversationsAfterAuth() {
 
   const apiBase = getBackendBase();
   try {
-    await fetch(`${apiBase}/conversations/migrate`, {
+    const response = await fetch(`${apiBase}/conversations/migrate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -588,8 +630,19 @@ export async function migrateGuestConversationsAfterAuth() {
         conversations: moved,
       }),
     });
-  } catch {
-    // local migration is authoritative when backend sync fails.
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      const error = payload.error || `Migration failed (${response.status})`;
+      console.warn('[Migration] Backend migration failed:', error, `(local migration of ${moved.length} conversations completed)`);
+      // Local migration is authoritative - continue silently
+    } else {
+      console.log(`[Migration] Successfully migrated ${moved.length} conversations to authenticated account`);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('[Migration] Network error during backend migration:', message, `(local migration of ${moved.length} conversations completed)`);
+    // Local migration is authoritative - continue silently
   }
 }
 

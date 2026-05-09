@@ -1178,6 +1178,79 @@ body {
   filter: blur(1px);
 }
 
+/* Error Notifications */
+.error-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 13000;
+  max-width: 420px;
+  animation: error-slide-in 0.3s ease-out;
+}
+
+.error-notification-content {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+.error-notification-close {
+  background: none;
+  border: none;
+  color: #991b1b;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0;
+  margin: -0.5rem -0.5rem -0.5rem auto;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.error-notification-close:hover {
+  opacity: 1;
+}
+
+.error-notification-fade {
+  animation: error-slide-out 0.3s ease-in forwards;
+}
+
+@keyframes error-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes error-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+@media (max-width: 640px) {
+  .error-notification {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+}
+
 .assistant-dashboard-shell {
   margin-top: 2rem;
   display: grid;
