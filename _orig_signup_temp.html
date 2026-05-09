@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up | DevLearn</title>
-    <script type="module" src="/src/main-light.ts"></script>
-    <link rel="stylesheet" href="/src/style-light.css" />
-
+    <link rel="stylesheet" href="./src/style-light.css" />
     <style>
       .auth-container {
         min-height: 100vh;
@@ -131,7 +129,6 @@
         color: var(--primary-color);
       }
     </style>
-
   </head>
   <body>
     <div class="auth-container">
@@ -154,12 +151,12 @@
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
+            <input type="password" id="password" name="password" placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó" required />
           </div>
 
           <div class="form-group">
             <label for="confirm-password">Confirm Password</label>
-            <input type="password" id="confirm-password" name="confirm-password" placeholder="••••••••" required />
+            <input type="password" id="confirm-password" name="confirm-password" placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó" required />
           </div>
 
           <div class="terms">
@@ -175,11 +172,40 @@
         </div>
 
         <div class="back-home">
-          <a href="./index.html">← Back to Home</a>
+          <a href="./index.html">ΓåÉ Back to Home</a>
         </div>
       </div>
     </div>
 
+    <script type="module">
+      import { getPostAuthRedirect, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
 
+      document.getElementById('signup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (password !== confirmPassword) {
+          alert('Passwords do not match.');
+          return;
+        }
+
+        if (!name || !email) {
+          alert('Please provide your name and email.');
+          return;
+        }
+
+        // Demo auth storage for static site.
+        localStorage.setItem('user_name', name);
+        localStorage.setItem('user_email', email);
+        localStorage.setItem('is_logged_in', 'true');
+
+        await migrateGuestConversationsAfterAuth();
+        window.location.href = getPostAuthRedirect('./dashboard.html');
+      });
+    </script>
   </body>
 </html>

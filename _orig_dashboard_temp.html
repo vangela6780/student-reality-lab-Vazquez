@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | DevLearn</title>
-    <script type="module" src="/src/main-light.ts"></script>
-    <link rel="stylesheet" href="/src/style-light.css" />
-
+    <link rel="stylesheet" href="./src/style-light.css" />
     <style>
       .dashboard-container {
         max-width: 1200px;
@@ -148,7 +146,6 @@
         margin-bottom: 1.5rem;
       }
     </style>
-
   </head>
   <body>
     <div class="navbar">
@@ -185,7 +182,7 @@
               <span>45% complete</span>
               <span>5 lessons</span>
             </div>
-            <a href="#" class="course-action">Continue →</a>
+            <a href="#" class="course-action">Continue ΓåÆ</a>
           </div>
         </div>
 
@@ -203,7 +200,7 @@
               <span>0% complete</span>
               <span>8 lessons</span>
             </div>
-            <a href="#" class="course-action">Start →</a>
+            <a href="#" class="course-action">Start ΓåÆ</a>
           </div>
         </div>
 
@@ -221,7 +218,7 @@
               <span>75% complete</span>
               <span>6 lessons</span>
             </div>
-            <a href="#" class="course-action">Continue →</a>
+            <a href="#" class="course-action">Continue ΓåÆ</a>
           </div>
         </div>
       </div>
@@ -253,6 +250,36 @@
       </div>
     </div>
 
+    <script type="module">
+      import { initDashboardAssistant, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
 
+      function checkAuth() {
+        const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+        const email = localStorage.getItem('user_email');
+        if (!isLoggedIn || !email) {
+          const returnTo = encodeURIComponent('./dashboard.html');
+          window.location.href = `./login.html?returnTo=${returnTo}`;
+          return;
+        }
+
+        const userName = localStorage.getItem('user_name') || 'Student';
+        document.getElementById('user-display').textContent = userName;
+      }
+
+      async function bootstrapDashboard() {
+        checkAuth();
+        await migrateGuestConversationsAfterAuth();
+        initDashboardAssistant();
+      }
+
+      window.handleLogout = function handleLogout() {
+        localStorage.removeItem('is_logged_in');
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('user_email');
+        window.location.href = './index.html';
+      };
+
+      bootstrapDashboard();
+    </script>
   </body>
 </html>

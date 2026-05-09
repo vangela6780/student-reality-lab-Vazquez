@@ -1,14 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="backend-url" content="https://ai-orchestration-nextjs.vercel.app/api" />
+    <meta name="backend-url" content="%VITE_BACKEND_URL%" />
     <title>DevLearn | Building Software Right</title>
     <meta name="description" content="Learn spec-driven development through interactive scrollytelling. Master how to build software the right way, from the start." />
-
-    <script type="module" src="/src/main-light.ts"></script>
-    <link rel="stylesheet" href="/src/style-light.css" />
+    <link rel="stylesheet" href="./src/style-light.css" />
   </head>
   <body>
     <!-- Navigation Header -->
@@ -92,7 +90,7 @@
         <h2>The 90% Problem</h2>
         <div class="content-grid">
           <div class="content-box">
-            <h3>📋 How Most Projects Start</h3>
+            <h3>≡ƒôï How Most Projects Start</h3>
             <p>
               A manager says "build a user dashboard." Developers jump straight into code. 
               Two weeks later: feature creep, unclear requirements, rewrites. 
@@ -100,7 +98,7 @@
             </p>
           </div>
           <div class="content-box highlight">
-            <h3>✅ How Spec-Driven Projects Start</h3>
+            <h3>Γ£à How Spec-Driven Projects Start</h3>
             <p>
               <strong>First:</strong> Write a specification.<br/>
               <strong>Then:</strong> Review with team + AI.<br/>
@@ -118,11 +116,11 @@
           <div class="spec-box">
             <h4>A spec isn't fancy. It's just clear.</h4>
             <ul class="spec-checklist">
-              <li>✓ What problem are we solving?</li>
-              <li>✓ Who are the users?</li>
-              <li>✓ What features matter first?</li>
-              <li>✓ How do we know it works?</li>
-              <li>✓ What are the constraints?</li>
+              <li>Γ£ô What problem are we solving?</li>
+              <li>Γ£ô Who are the users?</li>
+              <li>Γ£ô What features matter first?</li>
+              <li>Γ£ô How do we know it works?</li>
+              <li>Γ£ô What are the constraints?</li>
             </ul>
           </div>
           <div class="spec-box example">
@@ -145,22 +143,22 @@ Acceptance Criteria:
         <h2>Why Specs Matter</h2>
         <div class="benefits-grid">
           <div class="benefit-card">
-            <div class="benefit-icon">⚡</div>
+            <div class="benefit-icon">ΓÜí</div>
             <h3>Faster Development</h3>
             <p>No ambiguity. No rewrites. Developers know exactly what to build.</p>
           </div>
           <div class="benefit-card">
-            <div class="benefit-icon">🤝</div>
+            <div class="benefit-icon">≡ƒñ¥</div>
             <h3>Team Alignment</h3>
             <p>Everyone reads the same spec. Fewer meetings, better decisions.</p>
           </div>
           <div class="benefit-card">
-            <div class="benefit-icon">🧠</div>
+            <div class="benefit-icon">≡ƒºá</div>
             <h3>AI-Ready</h3>
             <p>Claude, ChatGPT, and other tools excel with clear specs. Get better code.</p>
           </div>
           <div class="benefit-card">
-            <div class="benefit-icon">📊</div>
+            <div class="benefit-icon">≡ƒôè</div>
             <h3>Measurable Quality</h3>
             <p>Spec defines "done." Test against it. Ship with confidence.</p>
           </div>
@@ -189,7 +187,7 @@ Acceptance Criteria:
           <div class="step">
             <div class="step-number">4</div>
             <h3>Use AI to Review</h3>
-            <p>Paste your spec → Ask Claude for gaps and improvements.</p>
+            <p>Paste your spec ΓåÆ Ask Claude for gaps and improvements.</p>
           </div>
           <div class="step">
             <div class="step-number">5</div>
@@ -221,13 +219,13 @@ Acceptance Criteria:
     <!-- Floating Chat Widget -->
     <div id="chat-widget" class="chat-widget" data-testid="chat-widget">
       <button id="chat-toggle" class="chat-toggle" title="Open Assistant" data-testid="chat-toggle">
-        <span class="chat-icon">💬</span>
+        <span class="chat-icon">≡ƒÆ¼</span>
       </button>
       <div id="chat-panel" class="chat-panel hidden" data-testid="chat-panel">
         <div class="chat-header">
           <div>
             <h3>DevLearn Assistant</h3>
-            <p id="chat-usage-label" class="chat-usage-label">5 free prompts left</p>
+            <p id="chat-usage-label" class="chat-usage-label">8 free prompts left</p>
           </div>
           <button id="chat-close" class="chat-close" data-testid="chat-close">&times;</button>
         </div>
@@ -239,6 +237,58 @@ Acceptance Criteria:
       </div>
     </div>
 
+    <script type="module">
+      import { initHomeChatWidget } from './src/lib/chat-experience.js';
 
+      initHomeChatWidget();
+
+      // Scrollytelling section observer: reveals sections and highlights active nav anchor.
+      const storySections = Array.from(document.querySelectorAll('.scroll-section'));
+      const storyLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+
+      const setActiveStoryLink = (sectionId) => {
+        storyLinks.forEach((link) => {
+          const target = link.getAttribute('href')?.slice(1);
+          link.classList.toggle('active', target === sectionId);
+        });
+      };
+
+      if (storySections.length > 0) {
+        const storyObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                if (entry.target.id) {
+                  setActiveStoryLink(entry.target.id);
+                }
+              }
+            });
+          },
+          { threshold: 0.45, rootMargin: '-10% 0px -20% 0px' }
+        );
+
+        storySections.forEach((section) => storyObserver.observe(section));
+
+        const updateActiveByScroll = () => {
+          let currentId = storySections[0]?.id;
+          const offset = window.innerHeight * 0.35;
+
+          storySections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= offset && rect.bottom >= offset) {
+              currentId = section.id;
+            }
+          });
+
+          if (currentId) {
+            setActiveStoryLink(currentId);
+          }
+        };
+
+        updateActiveByScroll();
+        window.addEventListener('scroll', updateActiveByScroll, { passive: true });
+      }
+    </script>
   </body>
 </html>
