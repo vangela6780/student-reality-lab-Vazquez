@@ -15,7 +15,7 @@ const STORAGE_KEYS = {
   guestUsageBySession: 'devlearn_guest_usage_by_session_v1',
 };
 
-const DEFAULT_GUEST_LIMIT = 8;
+const DEFAULT_GUEST_LIMIT = 5;
 const DEFAULT_API_BASE = 'https://ai-orchestration-nextjs.vercel.app/api';
 const WELCOME_MESSAGE = "Hello. I am your DevLearn assistant. Ask me about specifications, testing, or delivery planning.";
 
@@ -307,6 +307,11 @@ function createChatController(options) {
     }
 
     const blocked = !auth.isLoggedIn && remaining === 0;
+    if (blocked && options.redirectOnGuestLimit) {
+      window.location.href = createAuthLinks().signup;
+      return blocked;
+    }
+
     if (options.input) options.input.disabled = blocked || loading;
     if (options.sendButton) {
       options.sendButton.disabled = blocked || loading;
@@ -470,6 +475,7 @@ export function initHomeChatWidget() {
 
   const controller = createChatController({
     guestLimit: DEFAULT_GUEST_LIMIT,
+    redirectOnGuestLimit: true,
     chatShell: chatPanel,
     modalHost: document.body,
     messagesWrap: document.getElementById('chat-messages'),
