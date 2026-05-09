@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login | DevLearn</title>
-    <script type="module" src="./src/main-light.ts"></script>
     <link rel="stylesheet" href="./src/style-light.css" />
 
     <style>
@@ -169,6 +168,29 @@
       </div>
     </div>
 
+    <script type="module">
+      import { getPostAuthRedirect, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
 
+      // Clear any stale redirect-loop guard on page load
+      sessionStorage.removeItem('_redirect_guard');
+
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const name = email.split('@')[0] || 'Learner';
+
+        // Store auth state
+        localStorage.setItem('is_logged_in', 'true');
+        localStorage.setItem('user_email', email);
+        localStorage.setItem('user_name', name);
+
+        // Migrate any guest conversations
+        try { await migrateGuestConversationsAfterAuth(); } catch (err) { console.warn('Migration error:', err); }
+
+        // Redirect to the page the user came from, or dashboard
+        const redirect = getPostAuthRedirect('./dashboard.html');
+        window.location.href = redirect;
+      });
+    </script>
   </body>
 </html>

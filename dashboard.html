@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | DevLearn</title>
-    <script type="module" src="./src/main-light.ts"></script>
     <link rel="stylesheet" href="./src/style-light.css" />
 
     <style>
@@ -257,6 +256,9 @@
       import { initDashboardAssistant, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
       
       document.addEventListener('DOMContentLoaded', async () => {
+        // Clear redirect loop guard — we successfully landed on dashboard
+        sessionStorage.removeItem('_redirect_guard');
+
         // Initialize dashboard chat
         initDashboardAssistant();
         

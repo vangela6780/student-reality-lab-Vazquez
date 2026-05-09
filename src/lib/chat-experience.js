@@ -217,17 +217,56 @@ function incrementGuestUsage() {
   return usageBySession[sessionId];
 }
 
+// Returns true if the current page is a protected/auth page that should never be
+// redirect-looped (login, signup, dashboard).
+function isProtectedPage() {
+  return /\/(login|signup|dashboard)\.html(\?|#|$)?/.test(window.location.pathname);
+}
+
+// Safe redirect with loop protection: tracks redirect count in sessionStorage.
+// If too many redirects happen in a short window, bail out to the home page.
+function safeRedirect(url) {
+  const MAX_REDIRECTS = 3;
+  const RESET_MS = 5000;
+  const now = Date.now();
+
+  const raw = sessionStorage.getItem('_redirect_guard');
+  let guard = { count: 0, ts: now };
+  try {
+    if (raw) guard = JSON.parse(raw);
+  } catch { /* ignore */ }
+
+  // Reset counter if last redirect was more than RESET_MS ago
+  if (now - guard.ts > RESET_MS) {
+    guard = { count: 0, ts: now };
+  }
+
+  guard.count += 1;
+  guard.ts = now;
+
+  if (guard.count > MAX_REDIRECTS) {
+    // Too many redirects — clear guard and fall back to home page
+    sessionStorage.removeItem('_redirect_guard');
+    window.location.replace('./index.html');
+    return;
+  }
+
+  sessionStorage.setItem('_redirect_guard', JSON.stringify(guard));
+  window.location.href = url;
+}
+
 function createAuthLinks() {
   // Strip existing auth params before encoding to prevent recursive returnTo nesting
   const params = new URLSearchParams(window.location.search);
   params.delete('returnTo');
   params.delete('guestSessionId');
   const cleanSearch = params.toString() ? '?' + params.toString() : '';
-  const cleanUrl = window.location.pathname + cleanSearch + window.location.hash;
 
-  // If already on login/signup, fall back to homepage to avoid self-referential loops
-  const isAuthPage = /\/(login|signup)\.html$/.test(window.location.pathname);
-  const destination = isAuthPage ? './index.html' : cleanUrl;
+  // Use only the pathname (never the full href) to stop recursive encoding
+  const cleanUrl = window.location.pathname + cleanSearch;
+
+  // If already on login/signup/dashboard, fall back to homepage
+  const destination = isProtectedPage() ? './index.html' : cleanUrl;
 
   const returnTo = encodeURIComponent(destination);
   const guestSessionId = encodeURIComponent(getGuestSessionId());
@@ -358,7 +397,10 @@ function createChatController(options) {
 
     const blocked = !auth.isLoggedIn && remaining === 0;
     if (blocked && options.redirectOnGuestLimit) {
-      window.location.href = createAuthLinks().signup;
+      // Never redirect when already on an auth or dashboard page — prevents infinite loops
+      if (!isProtectedPage()) {
+        safeRedirect(createAuthLinks().signup);
+      }
       return blocked;
     }
 
@@ -522,9 +564,19 @@ function attachHomeUi(controller) {
 }
 
 export function initHomeChatWidget() {
+  // Guard: never run the home chat widget (with its redirect logic) on auth or
+  // dashboard pages. Those pages have their own controllers or no chat at all.
+  if (isProtectedPage()) return;
+
   const chatPanel = document.getElementById('chat-panel');
   const chatToggle = document.getElementById('chat-toggle');
   const chatClose = document.getElementById('chat-close');
+
+  // If there's no chat panel in the page, skip entirely — no widget to attach.
+  if (!chatPanel) return;
+
+  // Clear redirect-loop guard: user successfully loaded the page
+  sessionStorage.removeItem('_redirect_guard');
 
   const controller = createChatController({
     guestLimit: DEFAULT_GUEST_LIMIT,
@@ -664,9 +716,20 @@ export function getPostAuthRedirect(defaultPath = './dashboard.html') {
 
   try {
     const decoded = decodeURIComponent(returnTo);
+
+    // Reject if the decoded value itself contains a returnTo (nested redirect)
+    if (decoded.includes('returnTo=')) return defaultPath;
+
+    // Reject if it references another auth page (would create a loop)
+    if (/\/(login|signup)\.html/.test(decoded)) return defaultPath;
+
+    // Only allow relative paths — never absolute URLs or protocol-relative
     if (decoded.startsWith('/') || decoded.startsWith('./')) {
-      return decoded;
+      // Strip any query params that could re-trigger redirect logic
+      const cleanPath = decoded.split('?')[0];
+      return cleanPath || defaultPath;
     }
+
     return defaultPath;
   } catch {
     return defaultPath;

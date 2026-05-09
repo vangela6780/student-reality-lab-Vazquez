@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up | DevLearn</title>
-    <script type="module" src="./src/main-light.ts"></script>
     <link rel="stylesheet" href="./src/style-light.css" />
 
     <style>
@@ -180,6 +179,36 @@
       </div>
     </div>
 
+    <script type="module">
+      import { getPostAuthRedirect, migrateGuestConversationsAfterAuth } from './src/lib/chat-experience.js';
 
+      // Clear any stale redirect-loop guard on page load
+      sessionStorage.removeItem('_redirect_guard');
+
+      document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim() || 'Learner';
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm-password').value;
+
+        if (password !== confirm) {
+          alert('Passwords do not match.');
+          return;
+        }
+
+        // Store auth state
+        localStorage.setItem('is_logged_in', 'true');
+        localStorage.setItem('user_email', email);
+        localStorage.setItem('user_name', name);
+
+        // Migrate any guest conversations
+        try { await migrateGuestConversationsAfterAuth(); } catch (err) { console.warn('Migration error:', err); }
+
+        // Redirect to the page the user came from, or dashboard
+        const redirect = getPostAuthRedirect('./dashboard.html');
+        window.location.href = redirect;
+      });
+    </script>
   </body>
 </html>
