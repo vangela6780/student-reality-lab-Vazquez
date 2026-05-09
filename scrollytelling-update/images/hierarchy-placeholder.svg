@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Hierarchy illustration placeholder</title>
+  <desc id="desc">Abstract diagram with emphasized primary and secondary content blocks.</desc>
+  <rect width="1200" height="700" fill="#f6f2e8" />
+  <rect x="120" y="120" width="960" height="120" rx="20" fill="#0f766e" opacity="0.95" />
+  <rect x="120" y="280" width="450" height="280" rx="20" fill="#d97706" opacity="0.85" />
+  <rect x="630" y="280" width="450" height="130" rx="20" fill="#98b8b5" />
+  <rect x="630" y="430" width="450" height="130" rx="20" fill="#bdd4d2" />
+</svg>
