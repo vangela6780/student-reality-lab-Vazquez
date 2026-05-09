@@ -5,15 +5,29 @@ export default defineConfig({
   base: '/student-reality-lab-Vazquez/',
   root: './',
   publicDir: 'public',
+
+  // ⚠️ SECURITY FIX: Inject environment variables at build time
+  // These become available in index.html via window.__VITE_ENV__
+  define: {
+    __VITE_ENV__: JSON.stringify({
+      // Backend URL prefix - where to find /api/* endpoints
+      // For local development: /api (dev proxy routes to localhost:3000)
+      // For production: https://your-backend.vercel.app/api (full URL)
+      BACKEND_URL: process.env.VITE_BACKEND_URL || '/api',
+    }),
+  },
+
   server: {
-    // During local development, forward chat calls to the Next.js API backend.
+    // During local development, forward all /api/* calls to the Next.js API backend.
+    // This proxy does NOT ship with production builds - it only works during dev.
     proxy: {
-      '/api/chat': {
+      '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },
   },
+
   build: {
     outDir: 'build',
     emptyOutDir: true,
