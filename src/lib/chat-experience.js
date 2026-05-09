@@ -397,10 +397,8 @@ function createChatController(options) {
 
     const blocked = !auth.isLoggedIn && remaining === 0;
     if (blocked && options.redirectOnGuestLimit) {
-      // Never redirect when already on an auth or dashboard page — prevents infinite loops
-      if (!isProtectedPage()) {
-        safeRedirect(createAuthLinks().signup);
-      }
+      // Do not hard-redirect from the homepage when a guest reaches the limit.
+      // Keep the page usable and let the user choose login/signup from the modal.
       return blocked;
     }
 
