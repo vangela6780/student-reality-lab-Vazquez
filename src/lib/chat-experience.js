@@ -622,8 +622,19 @@ export function initHomeChatWidget() {
     ],
   });
 
-  chatToggle?.addEventListener('click', () => chatPanel?.classList.toggle('hidden'));
-  chatClose?.addEventListener('click', () => chatPanel?.classList.add('hidden'));
+  function setPanelOpen(isOpen) {
+    if (!chatPanel) return;
+    chatPanel.classList.toggle('hidden', !isOpen);
+    document.body.classList.toggle('chat-open', isOpen);
+  }
+
+  chatToggle?.addEventListener('click', () => {
+    if (!chatPanel) return;
+    const isOpen = chatPanel.classList.contains('hidden');
+    setPanelOpen(isOpen);
+  });
+
+  chatClose?.addEventListener('click', () => setPanelOpen(false));
 
   attachHomeUi(controller);
 }
