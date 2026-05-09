@@ -33,7 +33,7 @@ jobs:
 
       - name: Build site
         env:
-          VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
+          VITE_BACKEND_URL: https://ai-orchestration-nextjs.vercel.app/api
         run: npm run build
 
       - name: Setup Pages
