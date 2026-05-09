@@ -246,9 +246,13 @@ Acceptance Criteria:
       // ✅ SECURITY FIX: Read backend URL from Vite HTML env injection.
       // If the placeholder wasn't replaced, fall back to /api for local development.
       const backendUrlMeta = document.querySelector('meta[name="backend-url"]')?.getAttribute('content') || '';
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const fallbackBackend = isLocalhost
+        ? '/api'
+        : 'https://ai-orchestration-nextjs.vercel.app/api';
       const resolvedBackend = backendUrlMeta && !backendUrlMeta.includes('%VITE_BACKEND_URL%')
         ? backendUrlMeta
-        : '/api';
+        : fallbackBackend;
       const backendBase = resolvedBackend.replace(/\/$/, '');
       const simpleChatUrl = `${backendBase}/simple-chat`;
 
