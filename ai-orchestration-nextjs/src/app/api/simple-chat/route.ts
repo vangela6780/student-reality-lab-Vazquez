@@ -22,18 +22,52 @@ export async function POST(request: Request) {
       });
     }
 
+    // Verify API key is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('❌ OPENAI_API_KEY not configured');
+      return new Response(JSON.stringify({ 
+        error: 'API not configured: OPENAI_API_KEY is missing on server' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log(`📨 Processing chat message: "${message}"`);
+
     const { text } = await generateText({
-      model: openai('gpt-4.1-mini'),
-      system: 'You are a helpful assistant for spec-driven development. Keep your answers concise.',
+      model: openai('gpt-3.5-turbo'), // Use standard OpenAI model (most affordable and reliable)
+      system: 'You are a helpful assistant for spec-driven development. Keep your answers concise and practical.',
       prompt: message,
+      maxTokens: 500,
     });
+
+    console.log(`✅ Generated response: ${text.substring(0, 100)}...`);
 
     return new Response(JSON.stringify({ reply: text }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: String(error) }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Chat API Error:', errorMessage);
+
+    // Provide specific error messages for common issues
+    let userMessage = 'Failed to generate response';
+    if (errorMessage.includes('API key')) {
+      userMessage = 'API key error: Check server configuration';
+    } else if (errorMessage.includes('rate limit')) {
+      userMessage = 'Rate limit exceeded: Please try again in a moment';
+    } else if (errorMessage.includes('model')) {
+      userMessage = 'Model error: Check API configuration';
+    } else if (errorMessage.includes('network')) {
+      userMessage = 'Network error: Check internet connection';
+    }
+
+    return new Response(JSON.stringify({ 
+      error: userMessage,
+      detail: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

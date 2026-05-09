@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="backend-url" content="%VITE_BACKEND_URL%" />
     <title>DevLearn | Building Software Right</title>
     <meta name="description" content="Learn spec-driven development through interactive scrollytelling. Master how to build software the right way, from the start." />
     <link rel="stylesheet" href="./src/style-light.css" />
@@ -242,12 +243,13 @@ Acceptance Criteria:
       const chatInput = document.getElementById('chat-input');
       const chatMessages = document.getElementById('chat-messages');
 
-      // ✅ SECURITY FIX: Get backend URL from Vite environment variables (injected at build time)
-      // Local dev: /api (routes via Vite proxy to localhost:3000 to /api/simple-chat)
-      // Production: Full URL prefix from VITE_BACKEND_URL (e.g., https://backend.com)
-      // The backend URL should be a prefix that points to where /api/simple-chat lives
-      // Fallback: /api for local proxy
-      const backendBase = (window.__VITE_ENV__?.BACKEND_URL || '/api').replace(/\/$/, '');
+      // ✅ SECURITY FIX: Read backend URL from Vite HTML env injection.
+      // If the placeholder wasn't replaced, fall back to /api for local development.
+      const backendUrlMeta = document.querySelector('meta[name="backend-url"]')?.getAttribute('content') || '';
+      const resolvedBackend = backendUrlMeta && !backendUrlMeta.includes('%VITE_BACKEND_URL%')
+        ? backendUrlMeta
+        : '/api';
+      const backendBase = resolvedBackend.replace(/\/$/, '');
       const simpleChatUrl = `${backendBase}/simple-chat`;
 
       // Toggle chat panel visibility
@@ -286,8 +288,8 @@ Acceptance Criteria:
           await streamAssistantResponse(message, assistantMessage);
         } catch (error) {
           const detail = error instanceof Error ? error.message : String(error);
-          assistantMessage.textContent =
-            `I could not reach the AI service. ${detail}. Ensure the API server is running and OPENAI_API_KEY is set in ai-orchestration-nextjs/.env.local.`;
+          assistantMessage.textContent = `❌ Error: ${detail}`;
+          console.error('Chat error:', detail);
         } finally {
           setChatBusy(false);
         }
@@ -301,14 +303,23 @@ Acceptance Criteria:
           body: JSON.stringify({ message }),
         });
 
-        if (!response.ok || !response.body) {
-          throw new Error(`Chat API request failed (${response.status})`);
+        // Always try to parse JSON response
+        const data = await response.json().catch(() => ({}));
+
+        // Check if response was successful
+        if (!response.ok) {
+          const errorMsg = data.error || `Server error (${response.status})`;
+          throw new Error(errorMsg);
         }
 
-        const data = await response.json();
+        // Check for error in successful response
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Display the AI response
         const reply = data.reply || 'No response from AI.';
         assistantNode.textContent = reply;
-
       }
 
       function parseSseChunk(chunk) {
