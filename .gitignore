@@ -2,6 +2,9 @@
 node_modules/
 build/
 *.log
+.git.broken/
+assets/
+_orig_*_temp.html
 .DS_Store
 Thumbs.db
 ai-orchestration-nextjs/.next/
@@ -12,3 +15,4 @@ playwright-report/
 test-results/
 .vercel
 .env*.local
+node_modules
