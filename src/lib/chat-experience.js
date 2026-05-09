@@ -345,6 +345,27 @@ function renderTypingIndicator() {
   return row;
 }
 
+function renderStarterPrompts(prompts, onPick) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-starter-wrap';
+  wrap.innerHTML = `
+    <p class="chat-starter-title">Try one of these prompts</p>
+    <div class="chat-starter-grid"></div>
+  `;
+
+  const grid = wrap.querySelector('.chat-starter-grid');
+  prompts.forEach((prompt) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'chat-starter-btn';
+    button.textContent = prompt;
+    button.addEventListener('click', () => onPick(prompt));
+    grid.appendChild(button);
+  });
+
+  return wrap;
+}
+
 function attachAuthModal(options) {
   const links = createAuthLinks();
   const modal = document.createElement('div');
@@ -418,6 +439,15 @@ function createChatController(options) {
     conversation.messages.forEach((message) => {
       options.messagesWrap.appendChild(renderMessageNode(message));
     });
+
+    const showStarterPrompts = !showTyping
+      && Array.isArray(options.starterPrompts)
+      && options.starterPrompts.length > 0
+      && conversation.messages.length <= 1;
+
+    if (showStarterPrompts) {
+      options.messagesWrap.appendChild(renderStarterPrompts(options.starterPrompts, sendMessage));
+    }
 
     if (showTyping) {
       options.messagesWrap.appendChild(renderTypingIndicator());
@@ -585,6 +615,11 @@ export function initHomeChatWidget() {
     usageLabel: document.getElementById('chat-usage-label'),
     input: document.getElementById('chat-input'),
     sendButton: document.getElementById('chat-send'),
+    starterPrompts: [
+      'Give me a simple project specification template.',
+      'Turn this idea into user stories and acceptance criteria.',
+      'What should my MVP include for a student dashboard?',
+    ],
   });
 
   chatToggle?.addEventListener('click', () => chatPanel?.classList.toggle('hidden'));
@@ -602,11 +637,18 @@ function renderConversationList(container, conversations, activeId, onSelect) {
   }
 
   conversations.forEach((conversation) => {
+    const lastMessage = conversation.messages?.[conversation.messages.length - 1];
+    const preview = (lastMessage?.content || 'Start a new conversation')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 78);
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `assistant-thread ${conversation.id === activeId ? 'active' : ''}`;
     button.innerHTML = `
       <strong>${escapeHtml(conversation.title || 'New Conversation')}</strong>
+      <em class="assistant-thread-preview">${escapeHtml(preview)}${preview.length >= 78 ? '...' : ''}</em>
       <span>${formatTime(conversation.updatedAt)}</span>
     `;
     button.addEventListener('click', () => onSelect(conversation.id));
@@ -630,6 +672,11 @@ export function initDashboardAssistant() {
     usageLabel: document.getElementById('dashboard-chat-usage'),
     input: document.getElementById('dashboard-chat-input'),
     sendButton: document.getElementById('dashboard-chat-send'),
+    starterPrompts: [
+      'Help me write acceptance criteria for login.',
+      'Review my feature spec and find missing edge cases.',
+      'Create a test checklist for this sprint goal.',
+    ],
     onConversationSaved: refreshConversationList,
     onConversationSelected: refreshConversationList,
   });
