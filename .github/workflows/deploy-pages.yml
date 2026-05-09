@@ -31,9 +31,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Clean build output
+        run: rm -rf build
+
       - name: Build site
         env:
           VITE_BACKEND_URL: https://ai-orchestration-nextjs.vercel.app/api
+          VITE_BUILD_ID: ${{ github.sha }}
         run: npm run build
 
       - name: Setup Pages

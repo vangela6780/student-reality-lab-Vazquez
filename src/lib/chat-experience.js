@@ -18,6 +18,48 @@ const STORAGE_KEYS = {
 const DEFAULT_GUEST_LIMIT = 5;
 const DEFAULT_API_BASE = 'https://ai-orchestration-nextjs.vercel.app/api';
 const WELCOME_MESSAGE = "Hello. I am your DevLearn assistant. Ask me about specifications, testing, or delivery planning.";
+const BUILD_ID = typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : 'dev-local';
+const BUILD_TIME = typeof __APP_BUILD_TIME__ !== 'undefined' ? __APP_BUILD_TIME__ : 'unknown-time';
+
+function publishBuildDiagnostics() {
+  if (typeof window === 'undefined') return;
+
+  window.__DEVLEARN_BUILD__ = {
+    id: BUILD_ID,
+    time: BUILD_TIME,
+  };
+
+  document.documentElement?.setAttribute('data-build-id', BUILD_ID);
+  console.info(`[DevLearn] Build ${BUILD_ID} (${BUILD_TIME})`);
+}
+
+function cleanupLegacyCaches() {
+  if (typeof window === 'undefined') return;
+
+  const sessionKey = `devlearn_cache_cleanup_${BUILD_ID}`;
+  if (sessionStorage.getItem(sessionKey)) return;
+  sessionStorage.setItem(sessionKey, '1');
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => {});
+  }
+
+  if ('caches' in window) {
+    caches
+      .keys()
+      .then((keys) => {
+        const stale = keys.filter((key) => /devlearn|student-reality-lab|vite|workbox/i.test(key));
+        return Promise.all(stale.map((key) => caches.delete(key)));
+      })
+      .catch(() => {});
+  }
+}
+
+publishBuildDiagnostics();
+cleanupLegacyCaches();
 
 function readJson(key, fallback) {
   try {

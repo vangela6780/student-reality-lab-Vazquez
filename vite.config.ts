@@ -2,6 +2,8 @@ import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  const buildId = env.VITE_BUILD_ID || `local-${Date.now()}`
+  const buildTime = new Date().toISOString()
 
   return {
     // Use explicit GitHub Pages base so assets load reliably with or without trailing slash.
@@ -18,6 +20,8 @@ export default defineConfig(({ mode }) => {
         // For production: https://your-backend.vercel.app/api (full URL)
         BACKEND_URL: env.VITE_BACKEND_URL || '/api',
       }),
+      __APP_BUILD_ID__: JSON.stringify(buildId),
+      __APP_BUILD_TIME__: JSON.stringify(buildTime),
     },
 
     server: {
