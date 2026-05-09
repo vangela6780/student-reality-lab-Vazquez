@@ -218,7 +218,18 @@ function incrementGuestUsage() {
 }
 
 function createAuthLinks() {
-  const returnTo = encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
+  // Strip existing auth params before encoding to prevent recursive returnTo nesting
+  const params = new URLSearchParams(window.location.search);
+  params.delete('returnTo');
+  params.delete('guestSessionId');
+  const cleanSearch = params.toString() ? '?' + params.toString() : '';
+  const cleanUrl = window.location.pathname + cleanSearch + window.location.hash;
+
+  // If already on login/signup, fall back to homepage to avoid self-referential loops
+  const isAuthPage = /\/(login|signup)\.html$/.test(window.location.pathname);
+  const destination = isAuthPage ? './index.html' : cleanUrl;
+
+  const returnTo = encodeURIComponent(destination);
   const guestSessionId = encodeURIComponent(getGuestSessionId());
   return {
     login: `./login.html?returnTo=${returnTo}&guestSessionId=${guestSessionId}`,
